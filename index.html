@@ -7,11 +7,11 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <style>
-:root {
-  --bg:#070b0f; --s1:#0d1420; --s2:#111d2e; --card:#162036;
-  --border:#1e2d47; --border2:#253655; --text:#c9d5e3; --dim:#6a7d96; --muted:#3d5068;
-  --cyan:#00cfff; --cyan-dim:#003d5c; --green:#2eba62; --green-dim:#0b2b1a;
-  --red:#f04848; --red-dim:#2d0e0e; --gold:#d4a017; --gold-dim:#2b1f04; --r4:4px; --r8:8px;
+:root{
+  --bg:#070b0f;--s1:#0d1420;--s2:#111d2e;--card:#162036;
+  --border:#1e2d47;--border2:#253655;--text:#c9d5e3;--dim:#6a7d96;--muted:#3d5068;
+  --cyan:#00cfff;--cyan-dim:#003d5c;--green:#2eba62;--green-dim:#0b2b1a;
+  --red:#f04848;--red-dim:#2d0e0e;--gold:#d4a017;--gold-dim:#2b1f04;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:13px}
@@ -24,11 +24,15 @@ button{cursor:pointer;font-family:inherit;font-size:12px}
 
 /* SETUP */
 #setup-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-.setup-card{background:var(--s1);border:1px solid var(--border2);border-radius:var(--r8);padding:40px 36px;max-width:540px;width:100%;text-align:center}
+.setup-card{background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:40px 36px;max-width:560px;width:100%;text-align:center}
 .setup-logo{font-size:44px;margin-bottom:12px;filter:drop-shadow(0 0 20px #00cfff66)}
 .setup-card h1{font-size:20px;font-weight:700;color:#fff;margin-bottom:4px}
-.setup-card p{color:var(--dim);font-size:12px;margin-bottom:22px}
-.setup-note{background:var(--cyan-dim);border:1px solid #00cfff33;border-radius:6px;padding:14px 16px;font-size:11px;color:var(--dim);text-align:left;line-height:1.7;margin-bottom:20px}
+.setup-card>p{color:var(--dim);font-size:12px;margin-bottom:22px}
+.sources-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px}
+.src-box{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:10px 8px;font-size:11px;color:var(--dim)}
+.src-box .src-icon{font-size:20px;margin-bottom:4px}
+.src-box strong{display:block;color:var(--text);font-size:12px;margin-bottom:3px}
+.setup-note{background:var(--cyan-dim);border:1px solid #00cfff33;border-radius:6px;padding:12px 14px;font-size:11px;color:var(--dim);text-align:left;line-height:1.7;margin-bottom:16px}
 .setup-note strong{color:var(--text)}
 .setup-row{display:flex;gap:8px}
 .setup-row input{flex:1;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:9px 13px;border-radius:6px;font-size:13px;outline:none;transition:border-color .15s}
@@ -42,10 +46,14 @@ button{cursor:pointer;font-family:inherit;font-size:12px}
 #header{background:var(--s1);border-bottom:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex-shrink:0}
 .hd-title{font-size:14px;font-weight:700;color:#fff;white-space:nowrap}
 .hd-title span{color:var(--cyan)}
-.key-box{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r4);padding:3px 9px;flex:1;max-width:280px;min-width:0}
+.key-box{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:3px 9px;flex:1;max-width:280px;min-width:0}
 .key-box label{font-size:10px;color:var(--muted);white-space:nowrap}
 .key-box input{background:none;border:none;color:var(--dim);font-size:11px;outline:none;flex:1;min-width:0}
-.btn{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--r4);border:1px solid var(--border2);background:var(--card);color:var(--text);font-size:11px;transition:background .15s;white-space:nowrap}
+.src-pills{display:flex;gap:5px;margin-left:4px}
+.pill{font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;background:var(--card);border:1px solid var(--border2);color:var(--muted)}
+.pill.ok{color:var(--green);border-color:var(--green);background:var(--green-dim)}
+.pill.er{color:var(--red);border-color:var(--red);background:var(--red-dim)}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:4px;border:1px solid var(--border2);background:var(--card);color:var(--text);font-size:11px;transition:background .15s;white-space:nowrap}
 .btn:hover{background:var(--border2)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn-p{background:var(--cyan);border-color:var(--cyan);color:#000;font-weight:700}
@@ -72,32 +80,37 @@ button{cursor:pointer;font-family:inherit;font-size:12px}
 
 /* TABLE */
 #table-panel{flex:1;overflow-y:auto;border-right:1px solid var(--border);min-width:0}
-.grp-hdr{background:var(--s1);padding:5px 12px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
+.grp-hdr{background:var(--s1);padding:5px 12px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:6px}
+.grp-src{font-size:9px;font-weight:600;padding:1px 5px;border-radius:8px;border:1px solid;background:transparent}
+.src-fred{color:#4d9ef0;border-color:#4d9ef033}
+.src-yahoo{color:#6f42c1;border-color:#6f42c133}
+.src-cg{color:#2eba62;border-color:#2eba6233}
 #ind-table{width:100%;border-collapse:collapse}
 #ind-table thead{position:sticky;top:24px;z-index:4;background:var(--s1)}
 #ind-table th{padding:6px 10px;text-align:left;font-size:10px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
 #ind-table td{padding:6px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
 #ind-table tbody tr:hover td{background:var(--s2)}
 .c-no{color:var(--muted);font-size:10px;width:26px}
-.c-ser{font-family:'SFMono-Regular',Consolas,monospace;font-size:10px;color:#4d9ef0;white-space:nowrap}
+.c-ser{font-family:'SFMono-Regular',Consolas,monospace;font-size:10px;white-space:nowrap}
+.ser-fred{color:#4d9ef0} .ser-yahoo{color:#a371f7} .ser-cg{color:#3fb950}
 .c-name{font-weight:500;font-size:12px}
 .c-name small{display:block;font-size:10px;color:var(--muted)}
 .c-val{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;font-weight:600;white-space:nowrap}
 .c-date{font-size:10px;color:var(--muted);white-space:nowrap}
-.trend-u{color:var(--green)} .trend-d{color:var(--red)} .trend-f{color:var(--muted)}
-.val-bull{color:var(--green)} .val-bear{color:var(--red)}
+.trend-u{color:var(--green)}.trend-d{color:var(--red)}.trend-f{color:var(--muted)}
+.val-bull{color:var(--green)}.val-bear{color:var(--red)}
 .badge{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:19px;border-radius:10px;font-size:11px;font-weight:700;padding:0 5px}
-.b-hi{background:var(--green-dim);color:var(--green)} .b-mi{background:var(--gold-dim);color:var(--gold)} .b-lo{background:var(--red-dim);color:var(--red)}
+.b-hi{background:var(--green-dim);color:var(--green)}.b-mi{background:var(--gold-dim);color:var(--gold)}.b-lo{background:var(--red-dim);color:var(--red)}
 .sig{display:inline-flex;align-items:center;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700}
-.sg-bull{background:var(--green-dim);color:var(--green)} .sg-neu{background:var(--gold-dim);color:var(--gold)} .sg-bear{background:var(--red-dim);color:var(--red)}
-.loading-ph{color:var(--muted);font-size:10px} .err-ph{color:var(--muted);font-size:10px;font-style:italic}
+.sg-bull{background:var(--green-dim);color:var(--green)}.sg-neu{background:var(--gold-dim);color:var(--gold)}.sg-bear{background:var(--red-dim);color:var(--red)}
+.loading-ph{color:var(--muted);font-size:10px}.err-ph{color:var(--muted);font-size:10px;font-style:italic}
 
-/* CHART PANEL */
+/* CHART */
 #chart-panel{width:400px;min-width:300px;flex-shrink:0;display:flex;flex-direction:column}
 #cp-head{padding:9px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 #cp-head h3{font-size:12px;font-weight:600}
 .range-btns{display:flex;gap:3px}
-.rbtn{padding:3px 8px;font-size:10px;border:1px solid var(--border2);border-radius:var(--r4);background:none;color:var(--dim)}
+.rbtn{padding:3px 8px;font-size:10px;border:1px solid var(--border2);border-radius:4px;background:none;color:var(--dim)}
 .rbtn.active{background:var(--cyan);border-color:var(--cyan);color:#000;font-weight:700}
 #chart-wrap{padding:10px;flex-shrink:0}
 #chart-wrap canvas{width:100%!important}
@@ -110,41 +123,75 @@ button{cursor:pointer;font-family:inherit;font-size:12px}
 .cb-sc{font-size:11px;font-weight:700;min-width:28px;text-align:right}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{display:inline-block;width:10px;height:10px;border:2px solid var(--border2);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite}
-#tooltip{position:fixed;z-index:1000;pointer-events:none;background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:10px 13px;max-width:280px;font-size:12px;opacity:0;transition:opacity .15s}
+#tooltip{position:fixed;z-index:1000;pointer-events:none;background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:10px 13px;max-width:290px;font-size:12px;opacity:0;transition:opacity .15s}
 #tooltip h4{font-size:13px;color:#fff;margin-bottom:4px}
 #tooltip p{color:var(--dim);line-height:1.6;font-size:11px}
+#tooltip .src-tag{font-size:10px;margin-top:6px;color:var(--muted);font-style:italic}
 @media(max-width:840px){#main{flex-direction:column}#chart-panel{width:100%;min-width:0;border-top:1px solid var(--border)}#table-panel{border-right:none;max-height:50vh}}
 @media(max-width:560px){.hide-sm{display:none!important}}
 </style>
 </head>
 <body>
 
+<!-- SETUP -->
 <div id="setup-screen">
   <div class="setup-card">
     <div class="setup-logo">📊</div>
     <h1>宏觀經濟儀表板</h1>
-    <p>Macro Economic Dashboard · 32 項即時指標 · 0-10 綜合評分</p>
+    <p>32 項即時指標 · 三大數據來源 · 0-10 綜合評分</p>
+
+    <div class="sources-grid">
+      <div class="src-box">
+        <div class="src-icon">🏦</div>
+        <strong>FRED API</strong>
+        宏觀經濟數據<br>利率・流動性・GDP
+        <div style="margin-top:5px;font-size:10px;color:var(--cyan)">需要免費 Key</div>
+      </div>
+      <div class="src-box">
+        <div class="src-icon">📈</div>
+        <strong>Yahoo Finance</strong>
+        市場價格數據<br>黃金・原油・DXY
+        <div style="margin-top:5px;font-size:10px;color:var(--green)">無需 Key</div>
+      </div>
+      <div class="src-box">
+        <div class="src-icon">🪙</div>
+        <strong>CoinGecko</strong>
+        加密市占率<br>BTC・USDT・USDC
+        <div style="margin-top:5px;font-size:10px;color:var(--green)">無需 Key</div>
+      </div>
+    </div>
+
     <div class="setup-note">
-      本儀表板主要使用 <strong>FRED API（免費）</strong> 獲取宏觀數據，加密貨幣市占率使用 <strong>CoinGecko（免費・無需 Key）</strong>。<br>
-      FRED API Key 申請：<a href="https://fred.stlouisfed.org/docs/api/api_key.html" target="_blank">fred.stlouisfed.org</a> → 註冊 → My Account → API Keys（約 2 分鐘）<br><br>
-      <strong>新增指標</strong>：黃金・白銀・WTI原油・Brent原油・BTC市占率・山寨幣・穩定幣 USDC/USDT 市占率
+      <strong>FRED API Key（免費）申請方式：</strong><br>
+      前往 <a href="https://fred.stlouisfed.org/docs/api/api_key.html" target="_blank">fred.stlouisfed.org</a>
+      → 免費註冊 → My Account → API Keys → 生成（約 2 分鐘）
     </div>
     <div class="setup-row">
       <input type="password" id="setup-input" placeholder="貼入 FRED API Key …" />
       <button class="btn btn-p" onclick="initDashboard()">開始 →</button>
     </div>
-    <p class="setup-hint">API Key 僅儲存於瀏覽器 localStorage，不會上傳至任何伺服器。</p>
+    <p class="setup-hint">Key 僅存於瀏覽器 localStorage，不上傳至任何伺服器</p>
   </div>
 </div>
 
+<!-- DASHBOARD -->
 <div id="dashboard">
   <div id="header">
     <span class="hd-title">📊 <span>MACRO</span> DASHBOARD</span>
-    <div class="key-box"><label>FRED KEY</label><input type="password" id="hd-key" placeholder="已存入 …" /></div>
+    <div class="key-box">
+      <label>FRED</label>
+      <input type="password" id="hd-key" placeholder="已存入 …" />
+    </div>
+    <div class="src-pills">
+      <span class="pill" id="pill-fred">FRED</span>
+      <span class="pill" id="pill-yahoo">YF</span>
+      <span class="pill" id="pill-cg">CG</span>
+    </div>
     <button class="btn btn-p" id="refresh-btn" onclick="refreshAll()">↻ 更新</button>
     <span id="hd-status">就緒</span>
     <span id="hd-updated"></span>
   </div>
+
   <div id="score-bar">
     <div class="sb-circle" id="sb-circle"><span id="sb-num">—</span><span id="sb-den">/ 10</span></div>
     <div class="sb-info"><div class="sb-label">綜合市場評分</div><div id="sb-signal">計算中 …</div></div>
@@ -154,12 +201,14 @@ button{cursor:pointer;font-family:inherit;font-size:12px}
     </div>
     <div class="sb-legend hide-sm"><span>🔴 0–3 看跌</span><span>🟡 4–6 中性</span><span>🟢 7–10 看漲</span></div>
   </div>
+
   <div id="main">
     <div id="table-panel">
       <table id="ind-table">
         <thead><tr>
-          <th class="c-no">No</th><th>指標代碼</th><th>名稱</th>
-          <th>當前值</th><th class="hide-sm">日期</th><th>趨</th><th>評分</th><th class="hide-sm">信號</th>
+          <th class="c-no">No</th><th>指標</th><th>名稱</th>
+          <th>當前值</th><th class="hide-sm">日期</th>
+          <th>趨</th><th>評分</th><th class="hide-sm">信號</th>
         </tr></thead>
         <tbody id="tbl-body"></tbody>
       </table>
@@ -175,67 +224,152 @@ button{cursor:pointer;font-family:inherit;font-size:12px}
         </div>
       </div>
       <div id="chart-wrap"><canvas id="myChart" height="220"></canvas></div>
-      <div id="cb-panel"><div class="cb-grp">選擇指標（可多選比較）</div></div>
+      <div id="cb-panel"><div class="cb-grp">選擇指標比較</div></div>
     </div>
   </div>
 </div>
 
-<div id="tooltip" style="display:none"><h4 id="tt-h"></h4><p id="tt-p"></p></div>
+<div id="tooltip" style="display:none">
+  <h4 id="tt-h"></h4><p id="tt-p"></p><div class="src-tag" id="tt-src"></div>
+</div>
 
 <script>
 'use strict';
 const COLORS=['#00cfff','#3fb950','#f85149','#d29922','#8957e5','#f0883e','#39d353','#ff7b72','#79c0ff','#d2a8ff','#ffa657','#7ee787','#a9d6fb','#e3b341','#ff6e76','#ffdf5d','#9ecbff','#58a6ff','#56d364','#ff8c00','#a371f7','#2ea043','#6495ed','#da70d6','#20b2aa','#ffb6c1','#7b68ee','#00fa9a','#ff7f50','#40e0d0','#98fb98','#dda0dd'];
 
-const GRPS={sentiment:'市場情緒',commodities:'商品原物料',crypto:'加密貨幣市占',market:'市場指標',us_broad:'美國廣義利率',liquidity:'Fed 流動性',us_rates:'美國利率',global:'全球央行利率'};
+const SRC_LABEL={fred:'FRED',yahoo:'Yahoo Finance',coingecko:'CoinGecko'};
 
+const GRPS={
+  sentiment:'市場情緒',commodities:'商品原物料',crypto:'加密貨幣市占',
+  market:'市場指標',us_broad:'美國廣義利率',liquidity:'Fed 流動性',
+  us_rates:'美國利率',global:'全球央行利率'
+};
+const GRPS_SRC={
+  sentiment:'fred',commodities:'yahoo',crypto:'coingecko',
+  market:'yahoo',us_broad:'fred',liquidity:'fred',
+  us_rates:'fred',global:'fred'
+};
+
+// ─── INDICATORS ───────────────────────────────────────────────
 const INDS=[
-  // ── 1 VIX
-  {no:1,grp:'sentiment',series:'VIXCLS',src:'fred',cn:'恐慌指數（波動率指標）',en:'VIX Fear Index',unit:'',fav:'down',freq:'daily',desc:'VIX < 20 情緒良好・市場穩定 | VIX 20–30 恐懼上升 | VIX > 30 恐慌・系統風險 | 急拉代表市場可能有重大事件',def:true},
-  // ── 2-5 Commodities
-  {no:2,grp:'commodities',series:'GOLDAMGBD228NLBM',src:'fred',cn:'黃金',en:'Gold (USD/oz)',unit:'$',fav:'down',freq:'daily',desc:'黃金下降 = 市場越險需求低・風險偏好上升 | 黃金上升 = 避險需求增強・資金流出風險資產',def:false},
-  {no:3,grp:'commodities',series:'PSILVERUSDM',src:'fred',cn:'白銀',en:'Silver (USD/oz)',unit:'$',fav:'down',freq:'monthly',desc:'白銀下降 = 市場越險需求低・風險偏好上升 | 白銀上升 = 避險/工業需求驅動',def:false},
-  {no:4,grp:'commodities',series:'DCOILWTICO',src:'fred',cn:'原油 (WTI)',en:'WTI Crude Oil',unit:'$',fav:'down',freq:'daily',desc:'油價下降 = 商品與生活物費下降、通脹壓力減少 → 有利市場 | 油價上升 = 成本上漲',def:false},
-  {no:5,grp:'commodities',series:'DCOILBRENTEU',src:'fred',cn:'原油 (Brent)',en:'Brent Crude Oil',unit:'$',fav:'down',freq:'daily',desc:'Brent 油價下降 = 通脹壓力減少 → 有利市場',def:false},
-  // ── 6-10 Crypto/Market
-  {no:6,grp:'crypto',series:'BTC.D',src:'coingecko',cn:'比特幣市占率',en:'Bitcoin Dominance',unit:'%',fav:'down',freq:'live',desc:'BTC.D 上升 = 資金都停在BTC、整個加密市場資金集中 | 下降 = 資金離開BTC流向山寨幣・風險偏好上升',def:false},
-  {no:7,grp:'market',series:'DTWEXBGS',src:'fred',cn:'美元指數 (DXY)',en:'Broad Dollar Index',unit:'',fav:'down',freq:'daily',desc:'美元下降 = 全球流動性改善・新興市場壓力減少 → 有利風險資產 | 上升 = 資金外流・加息預期',def:false},
-  {no:8,grp:'crypto',series:'OTHERS.D',src:'coingecko',cn:'山寨幣市占率',en:'Altcoin Dominance',unit:'%',fav:'up',freq:'live',desc:'山寨幣市占率上升 = 資金流向山寨市場・風險偏好極度上升（Alt Season）| 下降 = 山寨幣資金外流',def:false},
-  {no:9,grp:'crypto',series:'USDC.D',src:'coingecko',cn:'穩定幣市占率 (USDC)',en:'USDC Dominance',unit:'%',fav:'down',freq:'live',desc:'穩定幣市占率下降 = 資金從穩定幣流出投入風險資產 → 看漲 | 上升 = 市場恐懼・持穩定幣待機',def:false},
-  {no:10,grp:'crypto',series:'USDT.D',src:'coingecko',cn:'穩定幣市占率 (USDT)',en:'USDT Dominance',unit:'%',fav:'down',freq:'live',desc:'穩定幣市占率下降 = 資金投入風險資產 → 看漲 | 上升 = 恐懼情緒・市場持幣觀望',def:false},
-  // ── 11 US broad rate
-  {no:11,grp:'us_broad',series:'IRSTCI01USM156N',src:'fred',cn:'美國利率（廣義利率水準）',en:'US Interest Rate (OECD)',unit:'%',fav:'down',freq:'monthly',desc:'反映美國廣義利率環境 | 下降 = 借貸成本降低・資金流向風險資產 | 上升 = 緊縮環境',def:false},
-  // ── 12-17 Liquidity
-  {no:12,grp:'liquidity',series:'WALCL',src:'fred',cn:'美聯儲資產負債表總資產',en:'Fed Balance Sheet',unit:'M$',fav:'up',freq:'weekly',desc:'擴表(QE) = QE・放水・資金寬鬆 → 利好市場 | 縮表(QT) = 收水・資金緊縮 → 不利市場',def:true},
-  {no:13,grp:'liquidity',series:'M2SL',src:'fred',cn:'美國 M2 貨幣供給量',en:'M2 Money Supply',unit:'B$',fav:'up',freq:'monthly',desc:'M2 成長 = 市場上「能用的錢」增多 → 資產價格獲支撐 | 下降 = 錢少了・風險資產承壓',def:false},
-  {no:14,grp:'liquidity',series:'WTREGEN',src:'fred',cn:'美國財政部一般賬戶 (TGA)',en:'Treasury General Account',unit:'M$',fav:'down',freq:'weekly',desc:'TGA 下降 = 政府「花出去」→ 放錢回市場(bullish) | 上升 = 政府「收走了」→ 回收流動性(bearish)',def:false},
-  {no:15,grp:'liquidity',series:'RRPONTSYD',src:'fred',cn:'隔夜逆回購（每日）',en:'ON RRP Daily Amount',unit:'M$',fav:'down',freq:'daily',desc:'RRP 下降 = 市場把多餘資金「投出去」→ 有更多錢進入風險資產 | 高企 = 錢停在 Fed 沒有流動',def:true},
-  {no:16,grp:'liquidity',series:'RRPONTSYD',src:'fred',cn:'逆回購餘額（Total Level）',en:'Reverse Repo Total Level',unit:'M$',fav:'down',freq:'daily',desc:'目前卡在 Fed 的資金總量 | 越低代表市場流動性越充裕・越高代表市場越緊縮',def:false},
-  {no:17,grp:'liquidity',series:'IORB',src:'fred',cn:'逆回購中標利率（加權平均）',en:'RRP Award Rate (IORB)',unit:'%',fav:'down',freq:'daily',desc:'Fed 給存錢利率 | 下降 = 錢可能流回市場/股市 | 上升 = 停在 Fed 更划算',def:false},
-  // ── 18-21 US Rates
-  {no:18,grp:'us_rates',series:'FEDFUNDS',src:'fred',cn:'聯邦基金有效利率',en:'Fed Funds Rate',unit:'%',fav:'down',freq:'monthly',desc:'銀行隔夜借貸的實際利率（Fed 真正執行的利率）| 降息 = 融資成本降低 → 有利股市・加密・山寨幣',def:true},
-  {no:19,grp:'us_rates',series:'DGS10',src:'fred',cn:'美國10年債殖利率',en:'US 10Y Treasury',unit:'%',fav:'down',freq:'daily',desc:'長期資金成本 + 對通脹與經濟的預期 | 下降 = 折現率降低 → 股票估值空間打開',def:true},
-  {no:20,grp:'us_rates',series:'DGS2',src:'fred',cn:'美國2年期公債殖利率',en:'US 2Y Treasury',unit:'%',fav:'down',freq:'daily',desc:'市場對未來 1–2 年利率政策走向的預期 | 下降快 = 市場開始押注降息',def:false},
-  {no:21,grp:'us_rates',series:'DFII10',src:'fred',cn:'美國10年期公債實際殖利率',en:'10Y Real Yield (TIPS)',unit:'%',fav:'down',freq:'daily',desc:'長期經濟 + 通脹 + 資金成本 | 下降 = 折現率降低・估值空間打開 → 有利風險資產・科技股・加密',def:false},
-  // ── 24-32 Global
-  {no:24,grp:'global',series:'IRSTCI01JPM156N',src:'fred',cn:'日本利率（廣義）',en:'Japan Interest Rate',unit:'%',fav:'down',freq:'monthly',desc:'反映日本利率環境 | 日本加息 = Yen Carry Trade 平倉風險・全球流動性衝擊',def:false},
-  {no:25,grp:'global',series:'INTDSRCNM193N',src:'fred',cn:'中國利率（廣義）',en:'China Interest Rate',unit:'%',fav:'down',freq:'monthly',desc:'中國寬鬆 = 有助全球成長預期・支撐大宗商品需求',def:false},
-  {no:26,grp:'global',series:'IRSTCI01DEM156N',src:'fred',cn:'德國利率（廣義）',en:'Germany Interest Rate',unit:'%',fav:'down',freq:'monthly',desc:'反映歐元區（德國為代表）利率環境',def:false},
-  {no:27,grp:'global',series:'IRSTCI01INM156N',src:'fred',cn:'印度利率（廣義）',en:'India Interest Rate',unit:'%',fav:'down',freq:'monthly',desc:'印度寬鬆 = 支持新興市場整體表現',def:false},
-  {no:28,grp:'global',series:'IRSTCI01GBM156N',src:'fred',cn:'英國利率（廣義）',en:'UK Interest Rate',unit:'%',fav:'down',freq:'monthly',desc:'英格蘭銀行利率環境',def:false},
-  {no:29,grp:'global',series:'IRSTCI01FRM156N',src:'fred',cn:'法國利率（廣義）',en:'France Interest Rate',unit:'%',fav:'down',freq:'monthly',desc:'法國/ECB 利率環境',def:false},
-  {no:30,grp:'global',series:'IRSTCI01ITM156N',src:'fred',cn:'義大利利率（廣義）',en:'Italy Interest Rate',unit:'%',fav:'down',freq:'monthly',desc:'義大利/ECB 利率環境',def:false},
-  {no:31,grp:'global',series:'IRSTCI01BRM156N',src:'fred',cn:'巴西利率（廣義）',en:'Brazil SELIC Rate',unit:'%',fav:'down',freq:'monthly',desc:'新興市場代表性高利率 | 降息有利新興市場資金流入',def:false},
-  {no:32,grp:'global',series:'IRSTCI01CAM156N',src:'fred',cn:'加拿大利率（廣義）',en:'Canada Interest Rate',unit:'%',fav:'down',freq:'monthly',desc:'加拿大央行通常比 Fed 早行動，具前瞻意義',def:false},
+  // 1 VIX
+  {no:1,grp:'sentiment',series:'VIX',src:'yahoo',yTicker:'^VIX',
+   cn:'恐慌指數（波動率指標）',en:'VIX Fear Index',unit:'',fav:'down',freq:'daily',
+   desc:'VIX < 20 情緒良好・市場穩定 | VIX 20–30 恐懼上升 | VIX > 30 恐慌・系統風險 | 急拉代表可能有重大事件',def:true},
+
+  // 2-5 Commodities (Yahoo Finance)
+  {no:2,grp:'commodities',series:'GOLD',src:'yahoo',yTicker:'GC=F',
+   cn:'黃金',en:'Gold Futures (USD/oz)',unit:'$',fav:'down',freq:'daily',
+   desc:'黃金下降 = 市場越險需求低・風險偏好上升 | 黃金上升 = 避險需求增強・資金流出風險資產',def:false},
+  {no:3,grp:'commodities',series:'SILVER',src:'yahoo',yTicker:'SI=F',
+   cn:'白銀',en:'Silver Futures (USD/oz)',unit:'$',fav:'down',freq:'daily',
+   desc:'白銀下降 = 市場越險需求低・風險偏好上升 | 白銀上升 = 避險/工業需求驅動',def:false},
+  {no:4,grp:'commodities',series:'WTI',src:'yahoo',yTicker:'CL=F',
+   cn:'原油 (WTI)',en:'WTI Crude Futures (USD/bbl)',unit:'$',fav:'down',freq:'daily',
+   desc:'油價下降 = 商品與生活物費下降・通脹壓力減少 → 有利市場 | 油價上升 = 成本上漲',def:false},
+  {no:5,grp:'commodities',series:'BRENT',src:'yahoo',yTicker:'BZ=F',
+   cn:'原油 (Brent)',en:'Brent Crude Futures (USD/bbl)',unit:'$',fav:'down',freq:'daily',
+   desc:'Brent 油價下降 = 通脹壓力減少 → 有利市場',def:false},
+
+  // 6 BTC.D (CoinGecko)
+  {no:6,grp:'crypto',series:'BTC.D',src:'coingecko',
+   cn:'比特幣市占率',en:'Bitcoin Dominance',unit:'%',fav:'down',freq:'live',
+   desc:'BTC.D 上升 = 資金都停在BTC・整個加密市場資金集中 | 下降 = 資金離開BTC流向山寨幣・風險偏好上升',def:false},
+
+  // 7 DXY (Yahoo Finance)
+  {no:7,grp:'market',series:'DXY',src:'yahoo',yTicker:'DX-Y.NYB',
+   cn:'美元指數 (DXY)',en:'US Dollar Index',unit:'',fav:'down',freq:'daily',
+   desc:'美元下降 = 全球流動性改善・新興市場壓力減少 → 有利風險資產 | 上升 = 資金回流美元',def:false},
+
+  // 8-10 Crypto (CoinGecko)
+  {no:8,grp:'crypto',series:'OTHERS.D',src:'coingecko',
+   cn:'山寨幣市占率',en:'Altcoin Dominance',unit:'%',fav:'up',freq:'live',
+   desc:'山寨幣市占率上升 = 資金流向山寨市場・風險偏好極度上升（Alt Season）| 下降 = 山寨幣資金外流',def:false},
+  {no:9,grp:'crypto',series:'USDC.D',src:'coingecko',
+   cn:'穩定幣市占率 (USDC)',en:'USDC Dominance',unit:'%',fav:'down',freq:'live',
+   desc:'穩定幣市占率下降 = 資金從穩定幣流出投入風險資產 → 看漲 | 上升 = 市場恐懼・持穩定幣待機',def:false},
+  {no:10,grp:'crypto',series:'USDT.D',src:'coingecko',
+   cn:'穩定幣市占率 (USDT)',en:'USDT Dominance',unit:'%',fav:'down',freq:'live',
+   desc:'穩定幣市占率下降 = 資金投入風險資產 → 看漲 | 上升 = 恐懼情緒・市場持幣觀望',def:false},
+
+  // 11 USINTR (FRED)
+  {no:11,grp:'us_broad',series:'FEDFUNDS',src:'fred',
+   cn:'美國利率（廣義利率水準）',en:'US Interest Rate (USINTR)',unit:'%',fav:'down',freq:'monthly',
+   desc:'反映美國廣義利率環境 | 下降 = 借貸成本降低・資金流向風險資產 | 上升 = 緊縮環境',def:false},
+
+  // 12-17 Liquidity (FRED)
+  {no:12,grp:'liquidity',series:'WALCL',src:'fred',
+   cn:'美聯儲資產負債表總資產',en:'Fed Balance Sheet (WALCL)',unit:'M$',fav:'up',freq:'weekly',
+   desc:'擴表(QE) = 放水・資金寬鬆 → 利好市場 | 縮表(QT) = 收水・資金緊縮 → 不利市場',def:true},
+  {no:13,grp:'liquidity',series:'M2SL',src:'fred',
+   cn:'美國 M2 貨幣供給量',en:'M2 Money Supply',unit:'B$',fav:'up',freq:'monthly',
+   desc:'M2 成長 = 市場上「能用的錢」增多 → 資產價格獲支撐 | 下降 = 錢少了・風險資產承壓',def:false},
+  {no:14,grp:'liquidity',series:'WTREGEN',src:'fred',
+   cn:'美國財政部一般賬戶 (TGA)',en:'Treasury General Account',unit:'M$',fav:'down',freq:'weekly',
+   desc:'TGA 下降 = 政府花錢「放回市場」→ 流動性注入(bullish) | 上升 = 從市場「回收資金」(bearish)',def:false},
+  {no:15,grp:'liquidity',series:'RRPONTSYD',src:'fred',
+   cn:'隔夜逆回購（每日）',en:'ON RRP Daily Amount',unit:'M$',fav:'down',freq:'daily',
+   desc:'RRP 下降 = 市場把多餘資金「投出去」→ 有更多錢進入風險資產 | 高企 = 錢停在 Fed 沒有流動',def:true},
+  {no:16,grp:'liquidity',series:'RRPONTSYD_TL',src:'fred',fredSeries:'RRPONTSYD',
+   cn:'逆回購餘額（Total Level）',en:'Reverse Repo Total Level',unit:'M$',fav:'down',freq:'daily',
+   desc:'目前卡在 Fed 的資金總量 | 越低代表市場流動性越充裕・越高代表市場越緊縮',def:false},
+  {no:17,grp:'liquidity',series:'IORB',src:'fred',
+   cn:'逆回購中標利率（加權平均）',en:'RRP Award Rate (IORB)',unit:'%',fav:'down',freq:'daily',
+   desc:'Fed 給存款準備金的利率（RRP 中標利率的基準）| 下降 = 停在 Fed 不划算・資金流回市場',def:false},
+
+  // 18-21 US Rates (FRED)
+  {no:18,grp:'us_rates',series:'FEDFUNDS_EFF',src:'fred',fredSeries:'FEDFUNDS',
+   cn:'聯邦基金有效利率',en:'Fed Funds Rate (FEDFUNDS)',unit:'%',fav:'down',freq:'monthly',
+   desc:'銀行隔夜借貸的實際利率（Fed 真正執行的利率）| 降息 = 融資成本降低 → 有利股市・加密・山寨幣',def:true},
+  {no:19,grp:'us_rates',series:'DGS10',src:'fred',
+   cn:'美國10年債殖利率 (US10)',en:'US 10Y Treasury',unit:'%',fav:'down',freq:'daily',
+   desc:'長期資金成本 + 對通脹與經濟的預期 | 下降 = 折現率降低 → 股票估值空間打開',def:true},
+  {no:20,grp:'us_rates',series:'DGS2',src:'fred',
+   cn:'美國2年期公債殖利率',en:'US 2Y Treasury',unit:'%',fav:'down',freq:'daily',
+   desc:'市場對未來 1–2 年利率政策走向的預期 | 下降快 = 市場開始押注降息',def:false},
+  {no:21,grp:'us_rates',series:'DFII10',src:'fred',
+   cn:'美國10年期公債實際殖利率 (GDGS10)',en:'10Y Real Yield (TIPS)',unit:'%',fav:'down',freq:'daily',
+   desc:'長期經濟 + 通脹 + 資金成本 | 下降 = 折現率降低・估值空間打開 → 有利風險資產・科技股・加密',def:false},
+
+  // 24-32 Global Rates (FRED)
+  {no:24,grp:'global',series:'IRSTCI01JPM156N',src:'fred',
+   cn:'日本利率（廣義）JPINTR',en:'Japan Interest Rate',unit:'%',fav:'down',freq:'monthly',
+   desc:'反映日本利率環境 | 日本加息 = Yen Carry Trade 平倉風險・全球流動性衝擊',def:false},
+  {no:25,grp:'global',series:'INTDSRCNM193N',src:'fred',
+   cn:'中國利率（廣義）CNINTR',en:'China Interest Rate',unit:'%',fav:'down',freq:'monthly',
+   desc:'中國寬鬆 = 有助全球成長預期・支撐大宗商品需求',def:false},
+  {no:26,grp:'global',series:'IRSTCI01DEM156N',src:'fred',
+   cn:'德國利率（廣義）DEINTR',en:'Germany Interest Rate',unit:'%',fav:'down',freq:'monthly',
+   desc:'反映歐元區（德國為代表）利率環境 | 整體緊縮 = 歐洲股市承壓',def:false},
+  {no:27,grp:'global',series:'IRSTCI01INM156N',src:'fred',
+   cn:'印度利率（廣義）ININTR',en:'India Interest Rate',unit:'%',fav:'down',freq:'monthly',
+   desc:'印度寬鬆 = 支持新興市場整體表現',def:false},
+  {no:28,grp:'global',series:'IRSTCI01GBM156N',src:'fred',
+   cn:'英國利率（廣義）GBINTR',en:'UK Interest Rate',unit:'%',fav:'down',freq:'monthly',
+   desc:'英格蘭銀行利率環境 | 英鎊資產的基準利率',def:false},
+  {no:29,grp:'global',series:'IRSTCI01FRM156N',src:'fred',
+   cn:'法國利率（廣義）FRINTR',en:'France Interest Rate',unit:'%',fav:'down',freq:'monthly',
+   desc:'法國/ECB 利率環境 | 歐洲廣義利率水準',def:false},
+  {no:30,grp:'global',series:'IRSTCI01ITM156N',src:'fred',
+   cn:'義大利利率（廣義）ININTR',en:'Italy Interest Rate',unit:'%',fav:'down',freq:'monthly',
+   desc:'義大利/ECB 利率環境・歐元區成員國代表',def:false},
+  {no:31,grp:'global',series:'IRSTCI01BRM156N',src:'fred',
+   cn:'巴西利率（廣義）BRINTR',en:'Brazil SELIC Rate',unit:'%',fav:'down',freq:'monthly',
+   desc:'新興市場代表性高利率 | 降息有利新興市場資金流入',def:false},
+  {no:32,grp:'global',series:'IRSTCI01CAM156N',src:'fred',
+   cn:'加拿大利率（廣義）CAINTR',en:'Canada Interest Rate',unit:'%',fav:'down',freq:'monthly',
+   desc:'加拿大央行通常比 Fed 早行動，具前瞻意義',def:false},
 ];
 
-/* ─── STATE ─── */
+// Helper: get the actual series ID used for fetch
+function getActualSeries(ind){return ind.fredSeries||ind.series}
+
+// ─── STATE ───
 const S={apiKey:'',data:{},hist:{},checked:new Set(),range:180,chart:null,busy:false};
 
-/* ─── SCORING ─── */
+// ─── SCORING ───
 const sc_VIX=v=>v<=13?9.5:v<=16?8.5:v<=19?7.0:v<=22?5.5:v<=26?4.0:v<=30?2.5:v<=40?1.5:0;
-const sc_10YIE=v=>{const d=Math.abs(v-2.2);return d<=0.2?8.5:d<=0.4?7.0:d<=0.6?5.5:d<=0.8?4.0:d<=1.0?2.5:1.0};
 const sc_TIPS=v=>v<=-1.5?9.5:v<=-0.5?8.0:v<=0?6.5:v<=0.5?5.0:v<=1.0?3.5:v<=1.5?2.0:0.5;
-const sc_YC=v=>v>=1.5?9.5:v>=1.0?8.5:v>=0.5?7.0:v>=0.1?5.5:v>=-0.2?4.0:v>=-0.5?2.5:v>=-1.0?1.5:0.5;
 const sc_10Y=v=>v<=1.5?9.0:v<=2.0?8.0:v<=2.5?7.0:v<=3.5?5.5:v<=4.5?3.5:v<=5.5?2.0:0.5;
 const sc_2Y=v=>v<=1.0?9.0:v<=2.0?7.5:v<=3.0?6.0:v<=4.0?4.5:v<=5.0?3.0:1.5;
 const sc_GLB=v=>v<=0.5?8.5:v<=1.5?7.0:v<=3.0?5.5:v<=5.0?4.0:v<=7.0?2.5:1.0;
@@ -244,32 +378,31 @@ const sc_BTCD=v=>v<40?8.5:v<50?7.0:v<55?5.5:v<60?4.0:v<65?2.5:1.5;
 const sc_OthersD=v=>v>25?8.5:v>20?7.0:v>15?5.5:v>10?4.0:2.5;
 const sc_StableD=v=>v<2?9.0:v<4?7.5:v<6?6.0:v<8?4.5:v<10?3.0:1.5;
 
-function sc_DXY(v,h){
-  if(!h||h.length<65)return 5;
-  const p=parseFloat(h[Math.min(h.length-1,63)].value);
-  if(!p)return 5;
-  const c=(v-p)/p*100;
-  return c<-4?8.5:c<-2?7.0:c<0?6.0:c<2?4.5:c<4?3.0:1.5;
-}
-function sc_Commodity(v,h,isMonthly){
-  const lb=isMonthly?12:252;
-  if(!h||h.length<lb)return 5;
-  const p=parseFloat(h[Math.min(h.length-1,lb)].value);
-  if(!p)return 5;
+function sc_Commodity(v,h){
+  if(!h||h.length<252)return 5;
+  const p=parseFloat(h[Math.min(h.length-1,252)].value);
+  if(!p||isNaN(p))return 5;
   const yoy=(v-p)/Math.abs(p)*100;
   return yoy<-20?8.5:yoy<-10?7.5:yoy<0?6.5:yoy<10?5.0:yoy<20?3.5:yoy<35?2.0:1.0;
+}
+function sc_DXY(v,h){
+  if(!h||h.length<63)return 5;
+  const p=parseFloat(h[Math.min(h.length-1,63)].value);
+  if(!p||isNaN(p))return 5;
+  const c=(v-p)/p*100;
+  return c<-4?8.5:c<-2?7.0:c<0?6.0:c<2?4.5:c<4?3.0:1.5;
 }
 function sc_WALCL(v,h){
   if(!h||h.length<26)return 5;
   const p=parseFloat(h[Math.min(h.length-1,26)].value);
-  if(!p)return 5;
+  if(!p||isNaN(p))return 5;
   const c=(v-p)/Math.abs(p)*100;
   return c>=3?9.0:c>=1?7.5:c>=-0.5?5.5:c>=-2?3.5:c>=-4?2.0:0.5;
 }
 function sc_M2(v,h){
   if(!h||h.length<12)return 5;
   const p=parseFloat(h[12].value);
-  if(!p)return 5;
+  if(!p||isNaN(p))return 5;
   const c=(v-p)/Math.abs(p)*100;
   return c>=7?9.0:c>=4?7.5:c>=1?5.5:c>=-1?4.0:c>=-3?2.5:1.0;
 }
@@ -291,49 +424,44 @@ function sc_FF(v,h){
 
 function dispatch(series,v,h,ind){
   switch(series){
-    case 'VIXCLS':return sc_VIX(v);
-    case 'GOLDAMGBD228NLBM':return sc_Commodity(v,h,false);
-    case 'PSILVERUSDM':return sc_Commodity(v,h,true);
-    case 'DCOILWTICO':case 'DCOILBRENTEU':return sc_Commodity(v,h,false);
+    case 'VIX':return sc_VIX(v);
+    case 'GOLD':case 'SILVER':case 'WTI':case 'BRENT':return sc_Commodity(v,h);
     case 'BTC.D':return sc_BTCD(v);
-    case 'DTWEXBGS':return sc_DXY(v,h);
+    case 'DXY':return sc_DXY(v,h);
     case 'OTHERS.D':return sc_OthersD(v);
     case 'USDC.D':case 'USDT.D':return sc_StableD(v);
     case 'WALCL':return sc_WALCL(v,h);
     case 'M2SL':return sc_M2(v,h);
     case 'WTREGEN':return sc_TGA(v,h);
-    case 'RRPONTSYD':return sc_RRP(v);
+    case 'RRPONTSYD':case 'RRPONTSYD_TL':return sc_RRP(v);
     case 'IORB':return sc_GLB(v);
-    case 'FEDFUNDS':return sc_FF(v,h);
+    case 'FEDFUNDS':case 'FEDFUNDS_EFF':return sc_FF(v,h);
     case 'DGS10':return sc_10Y(v);
     case 'DGS2':return sc_2Y(v);
     case 'DFII10':return sc_TIPS(v);
-    case 'T10Y2Y':return sc_YC(v);
-    case 'T10YIE':return sc_10YIE(v);
     default:return sc_GLB(v);
   }
 }
 
-/* ─── UTILS ─── */
-const delay=ms=>new Promise(r=>setTimeout(r,ms));
-const BIG_M=['WALCL','WTREGEN','RRPONTSYD','WRESBAL'];
+// ─── FORMAT ───
+const BIG_M=['WALCL','WTREGEN','RRPONTSYD','RRPONTSYD_TL'];
 const BIG_B=['M2SL'];
-
 function fmtVal(ind,raw){
   const s=ind.series;
   if(BIG_M.includes(s)){const B=raw/1000;return B>=1000?(B/1000).toFixed(2)+'T':B.toFixed(0)+'B'}
   if(BIG_B.includes(s))return (raw/1000).toFixed(1)+'T';
-  if(ind.unit==='$')return '$'+raw.toFixed(2);
+  if(ind.unit==='$')return '$'+raw.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   if(ind.unit==='%')return raw.toFixed(2)+'%';
   return raw.toFixed(2);
 }
 
-function getTrend(valid,ind){
-  const lb=ind.freq==='daily'?20:ind.freq==='monthly'?3:2;
+function getTrend(valid,freq){
+  const lb=freq==='daily'?20:freq==='monthly'?3:freq==='weekly'?8:2;
   if(!valid||valid.length<=lb)return 'f';
   const c=parseFloat(valid[0].value),p=parseFloat(valid[Math.min(valid.length-1,lb)].value);
   if(isNaN(p)||p===0)return 'f';
-  return (c-p)/Math.abs(p)>0.005?'u':(c-p)/Math.abs(p)<-0.005?'d':'f';
+  const chg=(c-p)/Math.abs(p);
+  return chg>0.005?'u':chg<-0.005?'d':'f';
 }
 
 function buildHistScores(ind,valid){
@@ -341,78 +469,128 @@ function buildHistScores(ind,valid){
   for(let i=0;i<valid.length;i++){
     const sub=valid.slice(i);
     const v=parseFloat(sub[0].value);
+    if(isNaN(v))continue;
     const sc=dispatch(ind.series,v,sub,ind);
-    if(sc!==null)pts.push({x:new Date(sub[0].date),y:+sc.toFixed(1)});
+    if(sc!=null)pts.push({x:new Date(sub[0].date),y:+sc.toFixed(1)});
   }
   return pts.reverse();
 }
 
-/* ─── COINGECKO FETCH ─── */
+// ─── COINGECKO ───
 async function fetchCoinGecko(){
   try{
-    const resp=await fetch('https://api.coingecko.com/api/v3/global');
-    const json=await resp.json();
-    const pct=json.data.market_cap_percentage||{};
-    const btcd=pct.btc||0,ethd=pct.eth||0,usdtd=pct.usdt||0,bnd=pct.bnb||0,usdcd=pct.usdc||0,xrpd=pct.xrp||0;
+    const r=await fetch('https://api.coingecko.com/api/v3/global');
+    const j=await r.json();
+    const p=j.data.market_cap_percentage||{};
+    const btcd=p.btc||0,ethd=p.eth||0,usdtd=p.usdt||0,bnd=p.bnb||0,usdcd=p.usdc||0,xrpd=p.xrp||0;
     const othersd=Math.max(0,100-btcd-ethd-usdtd-bnd-usdcd-xrpd);
     const map={'BTC.D':btcd,'USDC.D':usdcd,'USDT.D':usdtd,'OTHERS.D':othersd};
-    for(const [ser,val] of Object.entries(map)){
+    for(const[ser,val]of Object.entries(map)){
       const ind=INDS.find(i=>i.series===ser);if(!ind)continue;
-      const score=dispatch(ser,val,null,ind);
-      S.data[ser]={raw:val,score,str:val.toFixed(1)+'%',date:'live',trend:'f'};
+      S.data[ser]={raw:val,score:dispatch(ser,val,null,ind),str:val.toFixed(1)+'%',date:'live',trend:'f'};
       S.hist[ser]=[];
     }
+    setPill('cg',true);
   }catch(e){
     console.warn('CoinGecko:',e.message);
-    ['BTC.D','USDC.D','USDT.D','OTHERS.D'].forEach(ser=>{S.data[ser]={error:true};S.hist[ser]=[]});
+    ['BTC.D','USDC.D','USDT.D','OTHERS.D'].forEach(s=>{S.data[s]={error:true};S.hist[s]=[]});
+    setPill('cg',false);
   }
 }
 
-/* ─── FRED FETCH ─── */
-async function fetchInd(ind){
-  const lims={daily:780,weekly:156,monthly:48,quarterly:16};
-  const lim=lims[ind.freq]||100;
-  const url=`https://api.stlouisfed.org/fred/series/observations?series_id=${ind.series}&api_key=${S.apiKey}&file_type=json&limit=${lim}&sort_order=desc`;
-  const resp=await fetch(url);
-  if(!resp.ok)throw new Error('HTTP '+resp.status);
-  const json=await resp.json();
-  if(json.error_message)throw new Error(json.error_message);
-  const valid=(json.observations||[]).filter(o=>o.value&&o.value!=='.'&&!isNaN(parseFloat(o.value)));
-  if(!valid.length)throw new Error('No data');
+// ─── YAHOO FINANCE ───
+async function fetchYahoo(ind){
+  const url=`https://query1.finance.yahoo.com/v8/finance/chart/${ind.yTicker}?interval=1d&range=730d`;
+  const r=await fetch(url,{headers:{'Accept':'application/json'}});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const j=await r.json();
+  const res=j.chart?.result?.[0];
+  if(!res)throw new Error('No result');
+  const ts=res.timestamp||[];
+  const closes=res.indicators?.quote?.[0]?.close||[];
+  const valid=ts.map((t,i)=>({
+    date:new Date(t*1000).toISOString().split('T')[0],
+    value:closes[i]!=null&&!isNaN(closes[i])?String(closes[i]):null
+  })).filter(o=>o.value).sort((a,b)=>b.date.localeCompare(a.date));
+  if(!valid.length)throw new Error('Empty data');
   const raw=parseFloat(valid[0].value);
   const score=dispatch(ind.series,raw,valid,ind);
-  S.data[ind.series]={raw,score,str:fmtVal(ind,raw),date:valid[0].date,trend:getTrend(valid,ind)};
+  S.data[ind.series]={raw,score,str:fmtVal(ind,raw),date:valid[0].date,trend:getTrend(valid,ind.freq)};
   S.hist[ind.series]=buildHistScores(ind,valid);
 }
 
-/* ─── REFRESH ALL ─── */
+// ─── FRED ───
+async function fetchFred(ind){
+  const actualSer=getActualSeries(ind);
+  const lims={daily:780,weekly:156,monthly:48,quarterly:16};
+  const lim=lims[ind.freq]||100;
+  const url=`https://api.stlouisfed.org/fred/series/observations?series_id=${actualSer}&api_key=${S.apiKey}&file_type=json&limit=${lim}&sort_order=desc`;
+  const r=await fetch(url);
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const j=await r.json();
+  if(j.error_message)throw new Error(j.error_message);
+  const valid=(j.observations||[]).filter(o=>o.value&&o.value!=='.'&&!isNaN(parseFloat(o.value)));
+  if(!valid.length)throw new Error('No data');
+  const raw=parseFloat(valid[0].value);
+  const score=dispatch(ind.series,raw,valid,ind);
+  S.data[ind.series]={raw,score,str:fmtVal(ind,raw),date:valid[0].date,trend:getTrend(valid,ind.freq)};
+  S.hist[ind.series]=buildHistScores(ind,valid);
+}
+
+// ─── REFRESH ALL ───
+const delay=ms=>new Promise(r=>setTimeout(r,ms));
+function setStatus(t,loading){
+  document.getElementById('hd-status').innerHTML=loading?`<span class="spin"></span> ${t}`:t;
+}
+function setPill(src,ok){
+  const el=document.getElementById('pill-'+src);
+  if(el){el.classList.remove('ok','er');el.classList.add(ok?'ok':'er')}
+}
+
 async function refreshAll(){
   if(S.busy)return;
   S.busy=true;
-  const btn=document.getElementById('refresh-btn');
-  btn.disabled=true;
-  setStatus('連接 CoinGecko …',true);
+  document.getElementById('refresh-btn').disabled=true;
+
+  // Phase 1: CoinGecko
+  setStatus('🪙 CoinGecko …',true);
   await fetchCoinGecko();
-  INDS.filter(i=>i.src==='coingecko').forEach(ind=>{updateRow(ind);updateCbScore(ind)});
-  const fredInds=INDS.filter(i=>i.src==='fred');
-  for(let i=0;i<fredInds.length;i++){
-    const ind=fredInds[i];
-    setStatus(`FRED ${ind.series} (${i+1}/${fredInds.length})`,true);
-    try{await fetchInd(ind)}catch(e){console.warn(ind.series,e.message);S.data[ind.series]={error:true};S.hist[ind.series]=[]}
+  INDS.filter(i=>i.src==='coingecko').forEach(i=>{updateRow(i);updateCbScore(i)});
+
+  // Phase 2: Yahoo Finance
+  const yInds=INDS.filter(i=>i.src==='yahoo');
+  let yOk=0;
+  for(let i=0;i<yInds.length;i++){
+    const ind=yInds[i];
+    setStatus(`📈 Yahoo ${ind.cn} (${i+1}/${yInds.length})`,true);
+    try{await fetchYahoo(ind);yOk++}
+    catch(e){console.warn('Yahoo',ind.series,e.message);S.data[ind.series]={error:true};S.hist[ind.series]=[]}
+    updateRow(ind);updateCbScore(ind);
+    await delay(250);
+  }
+  setPill('yahoo',yOk===yInds.length);
+
+  // Phase 3: FRED
+  const fInds=INDS.filter(i=>i.src==='fred');
+  let fOk=0;
+  for(let i=0;i<fInds.length;i++){
+    const ind=fInds[i];
+    setStatus(`🏦 FRED ${getActualSeries(ind)} (${i+1}/${fInds.length})`,true);
+    try{await fetchFred(ind);fOk++}
+    catch(e){console.warn('FRED',ind.series,e.message);S.data[ind.series]={error:true};S.hist[ind.series]=[]}
     updateRow(ind);updateCbScore(ind);
     await delay(85);
   }
+  setPill('fred',fOk===fInds.length);
+
   updateOverall();updateChart();
   document.getElementById('hd-updated').textContent='更新: '+new Date().toLocaleTimeString('zh-TW');
   setStatus('已更新 ✓',false);
-  btn.disabled=false;S.busy=false;
+  document.getElementById('refresh-btn').disabled=false;
+  S.busy=false;
 }
 
-function setStatus(txt,loading){
-  document.getElementById('hd-status').innerHTML=loading?`<span class="spin"></span> ${txt}`:txt;
-}
-
-/* ─── TABLE ─── */
+// ─── TABLE ───
 function buildTable(){
   const tbody=document.getElementById('tbl-body');
   tbody.innerHTML='';
@@ -420,13 +598,20 @@ function buildTable(){
   INDS.forEach(ind=>{
     if(ind.grp!==lastGrp){
       lastGrp=ind.grp;
+      const srcKey=GRPS_SRC[ind.grp]||'fred';
+      const srcLabel=srcKey==='yahoo'?'Yahoo Finance':srcKey==='coingecko'?'CoinGecko':'FRED';
+      const srcCls='src-'+srcKey;
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td colspan="8" style="padding:0"><div class="grp-hdr">${GRPS[ind.grp]}</div></td>`;
+      tr.innerHTML=`<td colspan="8" style="padding:0"><div class="grp-hdr">${GRPS[ind.grp]}<span class="grp-src ${srcCls}">${srcLabel}</span></div></td>`;
       tbody.appendChild(tr);
     }
+    const ser=ind.yTicker||getActualSeries(ind);
+    const serCls='ser-'+(ind.src==='yahoo'?'yahoo':ind.src==='coingecko'?'cg':'fred');
     const tr=document.createElement('tr');
-    tr.id='r-'+ind.series+(ind.no===16?'_2':'');
-    tr.innerHTML=`<td class="c-no">${ind.no}</td><td class="c-ser">${ind.series}</td>
+    tr.id='r-'+ind.series;
+    tr.innerHTML=`
+      <td class="c-no">${ind.no}</td>
+      <td class="c-ser ${serCls}">${ser}</td>
       <td class="c-name">${ind.cn}<small>${ind.en}</small></td>
       <td class="c-val"><span class="loading-ph">…</span></td>
       <td class="c-date hide-sm"><span class="loading-ph">…</span></td>
@@ -441,37 +626,33 @@ function buildTable(){
 }
 
 function updateRow(ind){
-  const rowId='r-'+ind.series+(ind.no===16?'_2':'');
-  const tr=document.getElementById(rowId)||document.getElementById('r-'+ind.series);
-  if(!tr)return;
+  const tr=document.getElementById('r-'+ind.series);if(!tr)return;
   const td=tr.querySelectorAll('td');
   const d=S.data[ind.series];
   if(!d||d.error){
-    td[3].innerHTML='<span class="err-ph">N/A</span>';
-    td[4].innerHTML='<span class="err-ph">—</span>';td[5].innerHTML='<span class="trend-f">–</span>';
-    td[6].innerHTML='<span class="err-ph">—</span>';td[7].innerHTML='<span class="err-ph">—</span>';
+    td[3].innerHTML='<span class="err-ph">N/A</span>';td[4].innerHTML='<span class="err-ph">—</span>';
+    td[5].innerHTML='<span class="trend-f">–</span>';td[6].innerHTML='<span class="err-ph">—</span>';td[7].innerHTML='<span class="err-ph">—</span>';
     return;
   }
   const t=d.trend,ts=t==='u'?'↑':t==='d'?'↓':'→',tc=t==='u'?'trend-u':t==='d'?'trend-d':'trend-f';
   const bull=(ind.fav==='up'&&t==='u')||(ind.fav==='down'&&t==='d');
   const bear=(ind.fav==='up'&&t==='d')||(ind.fav==='down'&&t==='u');
-  const vc=bull?'val-bull':bear?'val-bear':'';
   const sc=d.score;
   const bc=sc==null?'b-mi':sc>=7?'b-hi':sc>=4?'b-mi':'b-lo';
   const sg=sc==null?{t:'—',c:''}:sc>=7?{t:'看漲 ↑',c:'sg-bull'}:sc>=4?{t:'中性 →',c:'sg-neu'}:{t:'看跌 ↓',c:'sg-bear'};
-  td[3].innerHTML=`<span class="${vc}">${d.str||'—'}</span>`;
+  td[3].innerHTML=`<span class="${bull?'val-bull':bear?'val-bear':''}">${d.str||'—'}</span>`;
   td[4].innerHTML=`<span class="c-date">${d.date||'—'}</span>`;
   td[5].innerHTML=`<span class="${tc}">${ts}</span>`;
   td[6].innerHTML=sc!=null?`<span class="badge ${bc}">${sc.toFixed(1)}</span>`:'<span class="err-ph">—</span>';
   td[7].innerHTML=`<span class="sig ${sg.c}">${sg.t}</span>`;
 }
 
-/* ─── OVERALL ─── */
+// ─── OVERALL ───
 function updateOverall(){
-  // Deduplicate by series (row 15/16 same series)
   const seen=new Set(),scores=[];
   INDS.forEach(ind=>{
-    if(seen.has(ind.series))return;seen.add(ind.series);
+    const key=getActualSeries(ind);
+    if(seen.has(key))return;seen.add(key);
     const sc=S.data[ind.series]?.score;if(sc!=null)scores.push(sc);
   });
   if(!scores.length)return;
@@ -487,11 +668,12 @@ function updateOverall(){
   document.getElementById('sg-fill').style.width=(avg/10*100)+'%';
 }
 
-/* ─── CHART ─── */
+// ─── CHART ───
 function initChart(){
   const ctx=document.getElementById('myChart').getContext('2d');
   S.chart=new Chart(ctx,{type:'line',data:{datasets:[]},options:{
-    responsive:true,maintainAspectRatio:true,interaction:{mode:'index',intersect:false},animation:{duration:250},
+    responsive:true,maintainAspectRatio:true,
+    interaction:{mode:'index',intersect:false},animation:{duration:250},
     scales:{
       x:{type:'time',time:{unit:'month',displayFormats:{month:'MMM yy'}},grid:{color:'#1e2d4766'},ticks:{color:'#3d5068',font:{size:10},maxTicksLimit:8}},
       y:{min:0,max:10,grid:{color:'#1e2d4766'},ticks:{color:'#3d5068',font:{size:10},stepSize:2,callback:v=>v}}
@@ -506,7 +688,7 @@ function updateChart(){
   const datasets=[{label:'中性線',data:[{x:cutoff,y:5},{x:new Date(),y:5}],borderColor:'#1e2d47',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false,tension:0,order:99}];
   let ci=0;
   INDS.forEach(ind=>{
-    if(!S.checked.has(ind.series+ind.no))return;
+    if(!S.checked.has(ind.series))return;
     const hist=S.hist[ind.series];
     if(!hist||!hist.length)return;
     const data=hist.filter(p=>p.x>=cutoff);
@@ -518,46 +700,57 @@ function updateChart(){
 }
 
 function setRange(d,btn){
-  S.range=d;document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');updateChart();
+  S.range=d;
+  document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  updateChart();
 }
 
-/* ─── CHECKBOXES ─── */
+// ─── CHECKBOXES ───
 function buildCheckboxes(){
   const panel=document.getElementById('cb-panel');panel.innerHTML='';
   let lastGrp=null;
   INDS.forEach((ind,i)=>{
     const col=COLORS[i%COLORS.length];
     if(ind.grp!==lastGrp){lastGrp=ind.grp;const lbl=document.createElement('div');lbl.className='cb-grp';lbl.textContent=GRPS[ind.grp];panel.appendChild(lbl)}
-    const key=ind.series+ind.no;
-    if(ind.def)S.checked.add(key);
+    if(ind.def)S.checked.add(ind.series);
     const item=document.createElement('div');item.className='cb-item';
-    item.innerHTML=`<input type="checkbox" id="cb-${key}" ${ind.def?'checked':''}
-      onchange="toggleSeries('${key}')">
+    item.innerHTML=`<input type="checkbox" id="cb-${ind.series}" ${ind.def?'checked':''}
+      onchange="toggleSeries('${ind.series}')">
       <div class="cb-dot" style="background:${col}"></div>
-      <label class="cb-lbl" for="cb-${key}">${ind.cn}</label>
-      <span class="cb-sc" id="cbs-${key}" style="color:var(--muted)">—</span>`;
+      <label class="cb-lbl" for="cb-${ind.series}">${ind.cn}</label>
+      <span class="cb-sc" id="cbs-${ind.series}" style="color:var(--muted)">—</span>`;
     panel.appendChild(item);
   });
 }
-
-function toggleSeries(key){S.checked.has(key)?S.checked.delete(key):S.checked.add(key);updateChart()}
-
+function toggleSeries(s){S.checked.has(s)?S.checked.delete(s):S.checked.add(s);updateChart()}
 function updateCbScore(ind){
-  const key=ind.series+ind.no;
-  const el=document.getElementById('cbs-'+key);if(!el)return;
+  const el=document.getElementById('cbs-'+ind.series);if(!el)return;
   const d=S.data[ind.series];
   if(!d||d.error||d.score==null){el.textContent='—';el.style.color='var(--muted)';return}
   el.textContent=d.score.toFixed(1);
   el.style.color=d.score>=7?'var(--green)':d.score>=4?'var(--gold)':'var(--red)';
 }
 
-/* ─── TOOLTIP ─── */
-function showTT(e,ind){const t=document.getElementById('tooltip');document.getElementById('tt-h').textContent=`${ind.cn} (${ind.series})`;document.getElementById('tt-p').textContent=ind.desc;t.style.display='block';setTimeout(()=>t.style.opacity='1',10);moveTT(e)}
-function moveTT(e){const t=document.getElementById('tooltip');let x=e.clientX+14,y=e.clientY+14;if(x+290>window.innerWidth)x=e.clientX-300;if(y+130>window.innerHeight)y=e.clientY-140;t.style.left=x+'px';t.style.top=y+'px'}
+// ─── TOOLTIP ───
+function showTT(e,ind){
+  const t=document.getElementById('tooltip');
+  const ser=ind.yTicker||getActualSeries(ind);
+  document.getElementById('tt-h').textContent=`${ind.cn} (${ser})`;
+  document.getElementById('tt-p').textContent=ind.desc;
+  document.getElementById('tt-src').textContent='數據來源: '+SRC_LABEL[ind.src];
+  t.style.display='block';setTimeout(()=>t.style.opacity='1',10);moveTT(e);
+}
+function moveTT(e){
+  const t=document.getElementById('tooltip');
+  let x=e.clientX+14,y=e.clientY+14;
+  if(x+300>window.innerWidth)x=e.clientX-310;
+  if(y+140>window.innerHeight)y=e.clientY-150;
+  t.style.left=x+'px';t.style.top=y+'px';
+}
 function hideTT(){const t=document.getElementById('tooltip');t.style.opacity='0';setTimeout(()=>t.style.display='none',150)}
 
-/* ─── INIT ─── */
+// ─── INIT ───
 function initDashboard(keyOverride){
   const key=keyOverride||document.getElementById('setup-input').value.trim();
   if(!key){alert('請輸入 FRED API Key');return}
@@ -569,7 +762,9 @@ function initDashboard(keyOverride){
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('hd-key').addEventListener('change',function(){const k=this.value.trim();if(k&&k!=='••••••••'){S.apiKey=k;localStorage.setItem('macroDashKey',k)}});
+  document.getElementById('hd-key').addEventListener('change',function(){
+    const k=this.value.trim();if(k&&k!=='••••••••'){S.apiKey=k;localStorage.setItem('macroDashKey',k)}
+  });
   document.getElementById('setup-input').addEventListener('keydown',e=>{if(e.key==='Enter')initDashboard()});
   const saved=localStorage.getItem('macroDashKey');if(saved)initDashboard(saved);
 });
