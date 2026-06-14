@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宏觀經濟儀表板 | Macro Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<style>
+/* ───────────────────────── TOKENS ───────────────────────── */
+:root {
+  --bg:       #070b0f;
+  --s1:       #0d1420;
+  --s2:       #111d2e;
+  --card:     #162036;
+  --border:   #1e2d47;
+  --border2:  #253655;
+  --text:     #c9d5e3;
+  --dim:      #6a7d96;
+  --muted:    #3d5068;
+  --cyan:     #00cfff;
+  --cyan-dim: #003d5c;
+  --green:    #2eba62;
+  --green-dim:#0b2b1a;
+  --red:      #f04848;
+  --red-dim:  #2d0e0e;
+  --gold:     #d4a017;
+  --gold-dim: #2b1f04;
+  --r4: 4px; --r6: 6px; --r8: 8px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 13px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, 'PingFang TC', 'Microsoft JhengHei', 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  line-height: 1.5;
+}
+a { color: var(--cyan); text-decoration: none; }
+a:hover { opacity: 0.8; }
+button { cursor: pointer; font-family: inherit; font-size: 12px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+input { font-family: inherit; }
+
+/* ───────────────────── SETUP SCREEN ───────────────────── */
+#setup-screen {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 20px;
+}
+.setup-card {
+  background: var(--s1);
+  border: 1px solid var(--border2);
+  border-radius: var(--r8);
+  padding: 40px 36px;
+  max-width: 520px; width: 100%;
+  text-align: center;
+}
+.setup-logo { font-size: 48px; margin-bottom: 14px; filter: drop-shadow(0 0 20px #00cfff66); }
+.setup-card h1 { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.setup-card p { color: var(--dim); font-size: 12px; margin-bottom: 24px; }
+.setup-note {
+  background: var(--cyan-dim); border: 1px solid #00cfff33;
+  border-radius: var(--r6); padding: 14px 16px;
+  font-size: 11px; color: var(--dim); text-align: left;
+  line-height: 1.7; margin-bottom: 20px;
+}
+.setup-note strong { color: var(--text); }
+.setup-row { display: flex; gap: 8px; }
+.setup-row input {
+  flex: 1; background: var(--bg); border: 1px solid var(--border2);
+  color: var(--text); padding: 9px 13px; border-radius: var(--r6);
+  font-size: 13px; outline: none; transition: border-color 0.15s;
+}
+.setup-row input:focus { border-color: var(--cyan); }
+.setup-hint { font-size: 10px; color: var(--muted); margin-top: 10px; }
+
+/* ───────────────────── DASHBOARD ───────────────────── */
+#dashboard { display: none; flex-direction: column; height: 100vh; overflow: hidden; }
+
+/* HEADER */
+#header {
+  background: var(--s1); border-bottom: 1px solid var(--border);
+  padding: 8px 14px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.hd-title { font-size: 14px; font-weight: 700; color: #fff; white-space: nowrap; }
+.hd-title span { color: var(--cyan); }
+.key-box {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--r4); padding: 3px 9px;
+  flex: 1; max-width: 280px; min-width: 0;
+}
+.key-box label { font-size: 10px; color: var(--muted); white-space: nowrap; }
+.key-box input {
+  background: none; border: none; color: var(--dim);
+  font-size: 11px; outline: none; flex: 1; min-width: 0;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 12px; border-radius: var(--r4);
+  border: 1px solid var(--border2); background: var(--card);
+  color: var(--text); font-size: 11px; transition: background 0.15s;
+  white-space: nowrap;
+}
+.btn:hover { background: var(--border2); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-primary { background: var(--cyan); border-color: var(--cyan); color: #000; font-weight: 700; }
+.btn-primary:hover { background: #00b8e8; }
+#hd-status { font-size: 10px; color: var(--muted); }
+#hd-updated { font-size: 10px; color: var(--muted); margin-left: auto; white-space: nowrap; }
+
+/* SCORE BAR */
+#score-bar {
+  background: var(--s2); border-bottom: 1px solid var(--border);
+  padding: 10px 14px;
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.sb-circle {
+  width: 58px; height: 58px; border-radius: 50%;
+  border: 3px solid var(--border); flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; transition: border-color 0.4s;
+  position: relative;
+}
+.sb-circle::before {
+  content: '';
+  position: absolute; inset: -6px;
+  border-radius: 50%;
+  background: transparent;
+  transition: box-shadow 0.4s;
+}
+#sb-num { font-size: 20px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+#sb-den { font-size: 9px; color: var(--muted); }
+.sb-info { flex: 1; min-width: 0; }
+.sb-label { font-size: 12px; font-weight: 600; color: #fff; margin-bottom: 2px; }
+#sb-signal { font-size: 11px; color: var(--dim); }
+.sb-gauge { flex: 2; min-width: 140px; }
+.sg-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-bottom: 3px; }
+.sg-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.sg-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--red) 0%, var(--gold) 50%, var(--green) 100%);
+  border-radius: 3px; transition: width 0.6s ease;
+}
+.sb-legend { display: flex; gap: 12px; font-size: 10px; color: var(--muted); flex-wrap: wrap; }
+.sb-legend span::before { margin-right: 3px; }
+
+/* MAIN SPLIT */
+#main { display: flex; flex: 1; overflow: hidden; }
+
+/* TABLE PANEL */
+#table-panel { flex: 1; overflow-y: auto; border-right: 1px solid var(--border); min-width: 0; }
+
+.grp-hdr {
+  background: var(--s1); padding: 5px 12px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 5;
+}
+
+#ind-table { width: 100%; border-collapse: collapse; }
+#ind-table thead { position: sticky; top: 24px; z-index: 4; background: var(--s1); }
+#ind-table th {
+  padding: 6px 10px; text-align: left;
+  font-size: 10px; font-weight: 600; color: var(--muted);
+  border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+#ind-table td { padding: 6px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+#ind-table tbody tr:hover td { background: var(--s2); }
+#ind-table tbody tr { cursor: default; }
+
+.c-no { color: var(--muted); font-size: 10px; width: 28px; }
+.c-ser { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 10px; color: #4d9ef0; white-space: nowrap; }
+.c-name { font-weight: 500; font-size: 12px; }
+.c-name small { display: block; font-size: 10px; color: var(--muted); }
+.c-val { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.c-date { font-size: 10px; color: var(--muted); white-space: nowrap; }
+.c-trend { text-align: center; font-size: 14px; width: 24px; }
+
+.trend-u { color: var(--green); }
+.trend-d { color: var(--red); }
+.trend-f { color: var(--muted); }
+.val-bull { color: var(--green); }
+.val-bear { color: var(--red); }
+
+.badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 34px; height: 19px; border-radius: 10px;
+  font-size: 11px; font-weight: 700; padding: 0 5px;
+  font-variant-numeric: tabular-nums;
+}
+.b-hi { background: var(--green-dim); color: var(--green); }
+.b-mi { background: var(--gold-dim);  color: var(--gold); }
+.b-lo { background: var(--red-dim);   color: var(--red); }
+
+.sig { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; }
+.sg-bull { background: var(--green-dim); color: var(--green); }
+.sg-neu  { background: var(--gold-dim);  color: var(--gold); }
+.sg-bear { background: var(--red-dim);   color: var(--red); }
+
+.loading-ph { color: var(--muted); font-size: 10px; }
+.err-ph     { color: var(--muted); font-size: 10px; font-style: italic; }
+
+/* CHART PANEL */
+#chart-panel {
+  width: 400px; min-width: 300px; flex-shrink: 0;
+  display: flex; flex-direction: column;
+}
+#cp-head {
+  padding: 9px 13px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+#cp-head h3 { font-size: 12px; font-weight: 600; }
+.range-btns { display: flex; gap: 3px; }
+.rbtn {
+  padding: 3px 8px; font-size: 10px;
+  border: 1px solid var(--border2); border-radius: var(--r4);
+  background: none; color: var(--dim); transition: background 0.1s;
+}
+.rbtn.active { background: var(--cyan); border-color: var(--cyan); color: #000; font-weight: 700; }
+#chart-wrap { padding: 10px; flex-shrink: 0; }
+#chart-wrap canvas { width: 100% !important; }
+
+#cb-panel { flex: 1; overflow-y: auto; padding: 6px 12px 12px; border-top: 1px solid var(--border); }
+.cb-grp { font-size: 10px; font-weight: 700; text-transform: uppercase;
+          color: var(--muted); letter-spacing: 0.5px; margin: 10px 0 4px; }
+.cb-item { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
+.cb-item input { cursor: pointer; accent-color: var(--cyan); }
+.cb-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.cb-lbl { font-size: 11px; color: var(--dim); flex: 1; cursor: pointer; }
+.cb-sc { font-size: 11px; font-weight: 700; min-width: 28px; text-align: right; }
+
+/* Spinner */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--border2);
+        border-top-color: var(--cyan); border-radius: 50%; animation: spin 0.7s linear infinite; }
+
+/* Tooltip */
+#tooltip {
+  position: fixed; z-index: 1000; pointer-events: none;
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: var(--r6); padding: 10px 13px; max-width: 260px;
+  font-size: 12px; opacity: 0; transition: opacity 0.15s;
+}
+#tooltip h4 { font-size: 13px; color: #fff; margin-bottom: 4px; }
+#tooltip p { color: var(--dim); line-height: 1.6; font-size: 11px; }
+
+/* Responsive */
+@media (max-width: 840px) {
+  #main { flex-direction: column; }
+  #chart-panel { width: 100%; min-width: 0; border-top: 1px solid var(--border); }
+  #table-panel { border-right: none; max-height: 50vh; }
+}
+@media (max-width: 560px) {
+  .hide-sm { display: none !important; }
+  #score-bar { gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ SETUP SCREEN ═══════════════════ -->
+<div id="setup-screen">
+  <div class="setup-card">
+    <div class="setup-logo">📊</div>
+    <h1>宏觀經濟儀表板</h1>
+    <p>Macro Economic Dashboard · 25+ 即時指標 · 0-10 綜合評分</p>
+    <div class="setup-note">
+      本儀表板透過 <strong>聯邦儲備銀行 FRED API（免費）</strong> 獲取即時數據。<br>
+      申請步驟：前往 <a href="https://fred.stlouisfed.org/docs/api/api_key.html" target="_blank">fred.stlouisfed.org/api</a>
+      → 免費註冊 → My Account → API Keys → 生成 Key（約 2 分鐘）。<br><br>
+      <strong>涵蓋指標</strong>：VIX・美元指數・HY信用利差・殖利率曲線・Fed資產負債表・M2・
+      TGA・逆回購・聯邦基金利率・10Y/2Y國債・全球9國央行利率 等。
+    </div>
+    <div class="setup-row">
+      <input type="password" id="setup-input" placeholder="貼入 FRED API Key …" />
+      <button class="btn btn-primary" onclick="initDashboard()">開始 →</button>
+    </div>
+    <p class="setup-hint">API Key 僅儲存於瀏覽器 localStorage，不會上傳至任何伺服器。</p>
+  </div>
+</div>
+
+<!-- ═══════════════════ DASHBOARD ═══════════════════ -->
+<div id="dashboard">
+
+  <!-- HEADER -->
+  <div id="header">
+    <span class="hd-title">📊 <span>MACRO</span> DASHBOARD</span>
+    <div class="key-box">
+      <label>FRED KEY</label>
+      <input type="password" id="hd-key" placeholder="已存入 …" />
+    </div>
+    <button class="btn btn-primary" id="refresh-btn" onclick="refreshAll()">↻ 更新</button>
+    <span id="hd-status">就緒</span>
+    <span id="hd-updated"></span>
+  </div>
+
+  <!-- SCORE BAR -->
+  <div id="score-bar">
+    <div class="sb-circle" id="sb-circle">
+      <span id="sb-num">—</span>
+      <span id="sb-den">/ 10</span>
+    </div>
+    <div class="sb-info">
+      <div class="sb-label">綜合市場評分</div>
+      <div id="sb-signal">計算中 …</div>
+    </div>
+    <div class="sb-gauge">
+      <div class="sg-labels"><span>極度不利</span><span>中性</span><span>極度有利</span></div>
+      <div class="sg-track"><div class="sg-fill" id="sg-fill"></div></div>
+    </div>
+    <div class="sb-legend hide-sm">
+      <span>🔴 0–3 看跌</span>
+      <span>🟡 4–6 中性</span>
+      <span>🟢 7–10 看漲</span>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- TABLE -->
+    <div id="table-panel">
+      <table id="ind-table">
+        <thead>
+          <tr>
+            <th class="c-no">No</th>
+            <th>指標代碼</th>
+            <th>名稱</th>
+            <th>當前值</th>
+            <th class="hide-sm">日期</th>
+            <th>趨</th>
+            <th>評分</th>
+            <th class="hide-sm">信號</th>
+          </tr>
+        </thead>
+        <tbody id="tbl-body"></tbody>
+      </table>
+    </div>
+
+    <!-- CHART PANEL -->
+    <div id="chart-panel">
+      <div id="cp-head">
+        <h3>📈 評分趨勢 (0–10)</h3>
+        <div class="range-btns">
+          <button class="rbtn" onclick="setRange(90,this)">3M</button>
+          <button class="rbtn active" onclick="setRange(180,this)">6M</button>
+          <button class="rbtn" onclick="setRange(365,this)">1Y</button>
+          <button class="rbtn" onclick="setRange(730,this)">2Y</button>
+        </div>
+      </div>
+      <div id="chart-wrap">
+        <canvas id="myChart" height="220"></canvas>
+      </div>
+      <div id="cb-panel">
+        <div class="cb-grp">選擇指標（可多選比較）</div>
+        <!-- generated -->
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /dashboard -->
+
+<div id="tooltip" style="display:none"><h4 id="tt-h"></h4><p id="tt-p"></p></div>
+
+<!-- ═══════════════════ SCRIPT ═══════════════════ -->
+<script>
+'use strict';
+
+/* ─── COLORS ─── */
+const COLORS = [
+  '#00cfff','#3fb950','#f85149','#d29922','#8957e5',
+  '#f0883e','#39d353','#ff7b72','#79c0ff','#d2a8ff',
+  '#ffa657','#7ee787','#a9d6fb','#e3b341','#ff6e76',
+  '#ffdf5d','#9ecbff','#58a6ff','#56d364','#ff8c00',
+  '#a371f7','#2ea043','#6495ed','#da70d6','#20b2aa',
+  '#ffb6c1','#7b68ee','#00fa9a','#ff7f50','#40e0d0'
+];
+
+/* ─── GROUP LABELS ─── */
+const GRPS = {
+  sentiment:'市場情緒',
+  market:'市場指標',
+  economy:'經濟數據',
+  liquidity:'Fed 流動性',
+  us_rates:'美國利率',
+  global:'全球央行利率'
+};
+
+/* ─── INDICATOR DEFINITIONS ─── */
+const INDS = [
+  /* SENTIMENT */
+  { no:1,  grp:'sentiment', series:'VIXCLS',          cn:'VIX 恐慌指數',           en:'VIX Fear Index',         unit:'',   fav:'down', freq:'daily',
+    desc:'VIX < 20 情緒良好 | VIX 20–30 恐懼上升 | VIX > 30 恐慌可能有系統風險 | 急拉代表重大事件', def:true },
+
+  /* MARKET */
+  { no:2,  grp:'market',    series:'DTWEXBGS',         cn:'廣義美元指數',           en:'Broad Dollar Index',     unit:'',   fav:'down', freq:'daily',
+    desc:'美元走弱 → 新興市場壓力減少、商品價格支撐、全球流動性改善 → 有利風險資產', def:false },
+  { no:3,  grp:'market',    series:'BAMLH0A0HYM2',     cn:'高收益信用利差',         en:'HY Credit Spread',       unit:'%',  fav:'down', freq:'daily',
+    desc:'利差收窄 = 信用市場健康、風險偏好上升 | 利差擴大 = 信用壓力、衰退警示', def:true },
+  { no:4,  grp:'market',    series:'T10YIE',            cn:'10年通脹盈虧平衡率',    en:'10Y Breakeven Inflation',unit:'%',  fav:'neutral', freq:'daily',
+    desc:'通脹預期 1.8–2.5% 最佳 | 過高 = 加息壓力 | 過低 = 通縮 / 需求不足憂慮', def:false },
+  { no:5,  grp:'market',    series:'DFII10',            cn:'10年TIPS實際利率',       en:'10Y Real Rate (TIPS)',   unit:'%',  fav:'down', freq:'daily',
+    desc:'實際利率越低 → 現金成本越高 → 股票、黃金更具吸引力 | 負實際利率最為寬鬆', def:false },
+
+  /* ECONOMY */
+  { no:6,  grp:'economy',   series:'UNRATE',            cn:'美國失業率',             en:'US Unemployment Rate',   unit:'%',  fav:'down', freq:'monthly',
+    desc:'低失業率 = 就業市場強勁 | 快速上升警示衰退（Sahm Rule：3月平均較12月最低值升≥0.5%）', def:false },
+  { no:7,  grp:'economy',   series:'CPIAUCSL',          cn:'CPI 通脹率 (YoY)',       en:'CPI Inflation YoY',      unit:'%',  fav:'neutral', freq:'monthly', xf:'yoy',
+    desc:'CPI 接近 2% 最佳 | 高通脹 = Fed 加息壓力 | 通脹快速降溫 = 降息空間開啟', def:false },
+  { no:8,  grp:'economy',   series:'INDPRO',            cn:'工業生產指數 (YoY)',     en:'Industrial Production',  unit:'%',  fav:'up', freq:'monthly', xf:'yoy',
+    desc:'工業生產上升 = 實體經濟擴張、企業盈利基礎改善 | 下降 = 衰退風險上升', def:false },
+  { no:9,  grp:'economy',   series:'GDPC1',             cn:'實際 GDP (QoQ 年化)',    en:'Real GDP Growth',        unit:'%',  fav:'up', freq:'quarterly', xf:'qoq',
+    desc:'連續兩季負成長 = 技術性衰退 | 強勁 GDP = 企業盈利和就業支撐', def:false },
+  { no:10, grp:'economy',   series:'T10Y2Y',            cn:'殖利率曲線 (10Y–2Y)',    en:'Yield Curve 10Y-2Y',     unit:'%',  fav:'up', freq:'daily',
+    desc:'正值 = 正常曲線 | 倒掛(負值) = 衰退強烈預警（通常領先衰退 12–18 個月）', def:true },
+  { no:11, grp:'economy',   series:'T5YIFR',            cn:'5年遠期通脹預期',        en:'5Y5Y Forward Inflation', unit:'%',  fav:'neutral', freq:'daily',
+    desc:'長期通脹錨定在 2–2.5% 最佳 | 預期脫錨上行 = Fed 公信力危機', def:false },
+
+  /* LIQUIDITY */
+  { no:12, grp:'liquidity', series:'WALCL',             cn:'Fed 資產負債表',         en:'Fed Balance Sheet',      unit:'M$', fav:'up', freq:'weekly',
+    desc:'擴表(QE) = 注入流動性、推升資產價格 | 縮表(QT) = 抽取流動性、壓制市場', def:true },
+  { no:13, grp:'liquidity', series:'M2SL',              cn:'M2 貨幣供應量',          en:'M2 Money Supply',        unit:'B$', fav:'up', freq:'monthly',
+    desc:'M2 成長 = 市場流動性充裕、資產價格獲支撐 | M2 收縮 = 流動性緊縮警示', def:false },
+  { no:14, grp:'liquidity', series:'WTREGEN',           cn:'財政部一般賬戶 (TGA)',   en:'Treasury General Account',unit:'M$',fav:'down', freq:'weekly',
+    desc:'TGA 下降 = 財政部花錢、流動性注入市場(bullish) | TGA 上升 = 從市場抽走資金(bearish)', def:false },
+  { no:15, grp:'liquidity', series:'RRPONTSYD',         cn:'隔夜逆回購 (ON RRP)',    en:'Overnight Reverse Repo', unit:'M$', fav:'down', freq:'daily',
+    desc:'RRP 下降 = 閒置資金重返市場(bullish) | RRP 高企 = 貨幣基金把錢停在 Fed', def:true },
+  { no:16, grp:'liquidity', series:'WRESBAL',           cn:'銀行準備金餘額',         en:'Bank Reserve Balances',  unit:'M$', fav:'up', freq:'weekly',
+    desc:'準備金充裕 = 銀行系統流動性良好、不易出現信用危機', def:false },
+
+  /* US RATES */
+  { no:17, grp:'us_rates',  series:'FEDFUNDS',          cn:'聯邦基金利率',           en:'Fed Funds Rate',         unit:'%',  fav:'down', freq:'monthly',
+    desc:'降息週期 = 降低全球融資成本、提升股票估值 | 加息週期 = 壓制 PE 倍數', def:true },
+  { no:18, grp:'us_rates',  series:'DGS10',             cn:'美國10年期國債',         en:'US 10Y Treasury',        unit:'%',  fav:'down', freq:'daily',
+    desc:'10Y = 全球無風險利率基準、影響所有資產定價 | 低利率 = 高 PE 可接受', def:true },
+  { no:19, grp:'us_rates',  series:'DGS2',              cn:'美國2年期國債',          en:'US 2Y Treasury',         unit:'%',  fav:'down', freq:'daily',
+    desc:'2Y 主要反映市場對未來 Fed 利率的預期 | 下行 = 市場押注降息', def:false },
+  { no:20, grp:'us_rates',  series:'MORTGAGE30US',      cn:'30年抵押貸款利率',       en:'30Y Mortgage Rate',      unit:'%',  fav:'down', freq:'weekly',
+    desc:'房貸利率直接影響房屋市場熱度與消費者支出', def:false },
+
+  /* GLOBAL */
+  { no:24, grp:'global',    series:'IRSTCI01JPM156N',   cn:'日本利率',               en:'Japan Short Rate',       unit:'%',  fav:'down', freq:'monthly',
+    desc:'日本超低利率支撐 Yen Carry Trade | 日本加息 = Carry Trade 平倉 = 全球流動性衝擊', def:false },
+  { no:25, grp:'global',    series:'INTDSRCNM193N',     cn:'中國利率',               en:'China Lending Rate',     unit:'%',  fav:'down', freq:'monthly',
+    desc:'中國寬鬆 = 有助全球成長預期、支撐大宗商品需求', def:false },
+  { no:26, grp:'global',    series:'IRSTCI01EZM156N',   cn:'歐元區利率',             en:'Euro Area Rate',         unit:'%',  fav:'down', freq:'monthly',
+    desc:'ECB 降息有利歐洲股市和全球金融環境', def:false },
+  { no:27, grp:'global',    series:'IRSTCI01GBM156N',   cn:'英國利率',               en:'UK Bank Rate',           unit:'%',  fav:'down', freq:'monthly',
+    desc:'英格蘭銀行利率 | 英鎊和英國資產定價基準', def:false },
+  { no:28, grp:'global',    series:'IRSTCI01CAM156N',   cn:'加拿大利率',             en:'Canada Rate',            unit:'%',  fav:'down', freq:'monthly',
+    desc:'加拿大央行通常比 Fed 早行動，具有前瞻意義', def:false },
+  { no:29, grp:'global',    series:'IRSTCI01AUM156N',   cn:'澳洲利率',               en:'Australia Rate',         unit:'%',  fav:'down', freq:'monthly',
+    desc:'澳洲與中國強相關，利率走向反映全球成長前景', def:false },
+  { no:30, grp:'global',    series:'IRSTCI01KRM156N',   cn:'南韓利率',               en:'South Korea Rate',       unit:'%',  fav:'down', freq:'monthly',
+    desc:'南韓科技出口敏感指標，利率走向具前瞻參考意義', def:false },
+  { no:31, grp:'global',    series:'IRSTCI01BRM156N',   cn:'巴西利率 (SELIC)',        en:'Brazil SELIC Rate',      unit:'%',  fav:'down', freq:'monthly',
+    desc:'新興市場代表性高利率 | 降息有利新興市場資金流入', def:false },
+  { no:32, grp:'global',    series:'IRSTCI01INM156N',   cn:'印度利率',               en:'India Rate',             unit:'%',  fav:'down', freq:'monthly',
+    desc:'印度寬鬆支持南亞新興市場整體表現', def:false },
+];
+
+/* ─── STATE ─── */
+const S = {
+  apiKey: '',
+  data: {},    // series → { raw, current, tv, str, date, score, trend }
+  hist: {},    // series → [{x,y}] score history
+  checked: new Set(),
+  range: 180,
+  chart: null,
+  busy: false
+};
+
+/* ─── SCORING ─── */
+const sc_VIX   = v => v<=13?9.5:v<=16?8.5:v<=19?7.0:v<=22?5.5:v<=26?4.0:v<=30?2.5:v<=40?1.5:0;
+const sc_HY    = v => v<=2.5?9.5:v<=3.5?8.0:v<=4.5?6.5:v<=5.5?5.0:v<=7?3.0:v<=9?1.5:0.5;
+const sc_10YIE = v => { const d=Math.abs(v-2.2); return d<=0.2?8.5:d<=0.4?7.0:d<=0.6?5.5:d<=0.8?4.0:d<=1.0?2.5:1.0; };
+const sc_TIPS  = v => v<=-1.5?9.5:v<=-0.5?8.0:v<=0?6.5:v<=0.5?5.0:v<=1.0?3.5:v<=1.5?2.0:0.5;
+const sc_CPI   = v => v<=1.0?6.0:v<=1.5?7.0:v<=2.0?8.5:v<=2.5?7.5:v<=3.0?6.0:v<=4.0?4.0:v<=5.5?2.5:v<=7?1.0:0;
+const sc_IP    = v => v>=4?9.0:v>=2.5?7.5:v>=1?6.0:v>=0?4.5:v>=-1.5?3.0:v>=-3?1.5:0.5;
+const sc_GDP   = v => v>=4?9.5:v>=2.5?8.0:v>=1.5?6.5:v>=0.5?5.0:v>=0?3.5:v>=-1.5?2.0:0.5;
+const sc_YC    = v => v>=1.5?9.5:v>=1.0?8.5:v>=0.5?7.0:v>=0.1?5.5:v>=-0.2?4.0:v>=-0.5?2.5:v>=-1.0?1.5:0.5;
+const sc_5YFR  = v => { const d=Math.abs(v-2.2); return d<=0.2?8.5:d<=0.4?7.0:d<=0.6?5.5:d<=0.8?4.0:2.5; };
+const sc_10Y   = v => v<=1.5?9.0:v<=2.0?8.0:v<=2.5?7.0:v<=3.5?5.5:v<=4.5?3.5:v<=5.5?2.0:0.5;
+const sc_2Y    = v => v<=1.0?9.0:v<=2.0?7.5:v<=3.0?6.0:v<=4.0?4.5:v<=5.0?3.0:1.5;
+const sc_MTG   = v => v<=4.0?9.0:v<=5.0?7.5:v<=6.0?6.0:v<=7.0?4.0:v<=8.0?2.0:0.5;
+const sc_GLB   = v => v<=0.5?8.5:v<=1.5?7.0:v<=3.0?5.5:v<=5.0?4.0:v<=7.0?2.5:1.0;
+
+function sc_DXY(v, h) {
+  if (!h || h.length < 65) return 5;
+  const p = parseFloat(h[Math.min(h.length-1, 63)].value);
+  if (!p) return 5;
+  const c = (v-p)/p*100;
+  return c<-4?8.5:c<-2?7.0:c<0?6.0:c<2?4.5:c<4?3.0:1.5;
+}
+function sc_UNRATE(v, h) {
+  let b = v<=3.5?8.0:v<=4.0?7.0:v<=4.5?5.5:v<=5.5?3.5:v<=7.0?2.0:0.5;
+  if (h && h.length > 6) {
+    const p = parseFloat(h[Math.min(h.length-1,6)].value);
+    if (!isNaN(p)) { const r=v-p; if(r>1)b=Math.max(0,b-3); else if(r>0.5)b=Math.max(0,b-1.5); }
+  }
+  return b;
+}
+function sc_WALCL(v, h) {
+  if (!h || h.length < 26) return 5;
+  const p = parseFloat(h[Math.min(h.length-1,26)].value);
+  if (!p) return 5;
+  const c = (v-p)/Math.abs(p)*100;
+  return c>=3?9.0:c>=1?7.5:c>=-0.5?5.5:c>=-2?3.5:c>=-4?2.0:0.5;
+}
+function sc_M2(v, h) {
+  if (!h || h.length < 12) return 5;
+  const p = parseFloat(h[12].value);
+  if (!p) return 5;
+  const c = (v-p)/Math.abs(p)*100;
+  return c>=7?9.0:c>=4?7.5:c>=1?5.5:c>=-1?4.0:c>=-3?2.5:1.0;
+}
+function sc_TGA(v, h) {
+  const B = v/1000;
+  const lv = B<=100?8.5:B<=300?7.0:B<=600?5.5:B<=900?4.0:2.0;
+  let tr = 5;
+  if (h && h.length >= 12) {
+    const pB = parseFloat(h[Math.min(h.length-1,12)].value)/1000;
+    if (!isNaN(pB)) { const d=B-pB; tr=d<-200?8.5:d<-50?7.0:d<0?6.0:d<100?4.5:d<300?3.0:1.5; }
+  }
+  return (lv+tr)/2;
+}
+function sc_RRP(v) { const B=v/1000; return B<=50?9.5:B<=150?8.0:B<=300?6.5:B<=600?5.0:B<=1000?3.0:B<=1500?1.5:0.5; }
+function sc_RES(v, h) {
+  if (!h || h.length < 26) return 5;
+  const p = parseFloat(h[Math.min(h.length-1,26)].value);
+  if (!p) return 5;
+  const c = (v-p)/Math.abs(p)*100;
+  return c>=5?8.5:c>=2?7.0:c>=0?5.5:c>=-3?4.0:c>=-6?2.5:1.0;
+}
+function sc_FF(v, h) {
+  let b = v<=0.5?9.0:v<=1.5?7.5:v<=2.5?6.0:v<=3.5?4.5:v<=4.5?3.0:v<=5.5?1.5:0.5;
+  if (h && h.length > 3) {
+    const p = parseFloat(h[Math.min(h.length-1,3)].value);
+    if (!isNaN(p)) { if(v<p-0.1) b=Math.min(10,b+1); else if(v>p+0.1) b=Math.max(0,b-1); }
+  }
+  return b;
+}
+
+function dispatch(series, v, h, ind) {
+  switch(series) {
+    case 'VIXCLS':       return sc_VIX(v);
+    case 'DTWEXBGS':     return sc_DXY(v, h);
+    case 'BAMLH0A0HYM2': return sc_HY(v);
+    case 'T10YIE':       return sc_10YIE(v);
+    case 'DFII10':       return sc_TIPS(v);
+    case 'UNRATE':       return sc_UNRATE(v, h);
+    case 'CPIAUCSL':     return sc_CPI(v);
+    case 'INDPRO':       return sc_IP(v);
+    case 'GDPC1':        return sc_GDP(v);
+    case 'T10Y2Y':       return sc_YC(v);
+    case 'T5YIFR':       return sc_5YFR(v);
+    case 'WALCL':        return sc_WALCL(v, h);
+    case 'M2SL':         return sc_M2(v, h);
+    case 'WTREGEN':      return sc_TGA(v, h);
+    case 'RRPONTSYD':    return sc_RRP(v);
+    case 'WRESBAL':      return sc_RES(v, h);
+    case 'FEDFUNDS':     return sc_FF(v, h);
+    case 'DGS10':        return sc_10Y(v);
+    case 'DGS2':         return sc_2Y(v);
+    case 'MORTGAGE30US': return sc_MTG(v);
+    default: return ind.grp === 'global' ? sc_GLB(v) : 5;
+  }
+}
+
+function getTV(ind, valid) {
+  if (!valid || !valid.length) return null;
+  const cur = parseFloat(valid[0].value);
+  if (ind.xf === 'yoy' && valid.length >= 13) {
+    const p = parseFloat(valid[12].value);
+    if (!isNaN(p) && Math.abs(p) > 0.001) return (cur-p)/Math.abs(p)*100;
+    return null;
+  }
+  if (ind.xf === 'qoq' && valid.length >= 2) {
+    const p = parseFloat(valid[1].value);
+    if (!isNaN(p) && Math.abs(p) > 0.001) return (cur-p)/Math.abs(p)*400;
+    return null;
+  }
+  return cur;
+}
+
+function computeScore(ind, valid) {
+  const tv = getTV(ind, valid);
+  if (tv === null) return null;
+  return dispatch(ind.series, tv, valid, ind);
+}
+
+/* ─── FORMAT DISPLAY ─── */
+const BIG_M = ['WALCL','WTREGEN','RRPONTSYD','WRESBAL'];
+const BIG_B = ['M2SL'];
+function fmtVal(ind, raw, tv) {
+  const s = ind.series;
+  if (BIG_M.includes(s)) {
+    const B = raw/1000;
+    return B>=1000 ? (B/1000).toFixed(2)+'T' : B.toFixed(0)+'B';
+  }
+  if (BIG_B.includes(s)) return (raw/1000).toFixed(1)+'T';
+  if (ind.xf) return (tv>=0?'+':'')+tv.toFixed(1)+'%';
+  return tv.toFixed(2)+(ind.unit==='%'?' %':'');
+}
+
+function getTrend(valid, ind) {
+  const lb = ind.freq==='daily'?20:ind.freq==='monthly'?3:2;
+  if (!valid || valid.length <= lb) return 'f';
+  const c = parseFloat(valid[0].value);
+  const p = parseFloat(valid[Math.min(valid.length-1,lb)].value);
+  if (isNaN(p) || p===0) return 'f';
+  const chg = (c-p)/Math.abs(p);
+  return chg>0.005?'u':chg<-0.005?'d':'f';
+}
+
+/* ─── HISTORY SCORES for chart ─── */
+function buildHistScores(ind, valid) {
+  const pts = [];
+  const minLB = ind.xf==='yoy'?13:ind.xf==='qoq'?2:0;
+  for (let i=0; i<valid.length; i++) {
+    const sub = valid.slice(i);
+    if (sub.length < minLB+1) continue;
+    const cur = parseFloat(sub[0].value);
+    let tv = cur;
+    if (ind.xf==='yoy' && sub.length>=13) {
+      const p=parseFloat(sub[12].value);
+      if(isNaN(p)||Math.abs(p)<0.001) continue;
+      tv=(cur-p)/Math.abs(p)*100;
+    } else if (ind.xf==='qoq' && sub.length>=2) {
+      const p=parseFloat(sub[1].value);
+      if(isNaN(p)||Math.abs(p)<0.001) continue;
+      tv=(cur-p)/Math.abs(p)*400;
+    }
+    const sc = dispatch(ind.series, tv, sub, ind);
+    if (sc!==null) pts.push({ x:new Date(sub[0].date), y:+sc.toFixed(1) });
+  }
+  return pts.reverse();
+}
+
+/* ─── FETCH ─── */
+const delay = ms => new Promise(r=>setTimeout(r,ms));
+
+async function fetchInd(ind) {
+  const lims = {daily:780,weekly:156,monthly:48,quarterly:16};
+  const lim = lims[ind.freq]||100;
+  const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${ind.series}&api_key=${S.apiKey}&file_type=json&limit=${lim}&sort_order=desc`;
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  const json = await resp.json();
+  if (json.error_message) throw new Error(json.error_message);
+  const valid = (json.observations||[]).filter(o=>o.value&&o.value!=='.'&&!isNaN(parseFloat(o.value)));
+  if (!valid.length) throw new Error('No data');
+  const raw = parseFloat(valid[0].value);
+  const tv  = getTV(ind, valid);
+  const score = tv!==null ? dispatch(ind.series, tv, valid, ind) : null;
+  S.data[ind.series] = {
+    raw, tv, score,
+    str: tv!==null ? fmtVal(ind, raw, tv) : 'N/A',
+    date: valid[0].date,
+    trend: getTrend(valid, ind)
+  };
+  S.hist[ind.series] = buildHistScores(ind, valid);
+}
+
+async function refreshAll() {
+  if (S.busy) return;
+  S.busy = true;
+  const btn = document.getElementById('refresh-btn');
+  btn.disabled = true;
+  setStatus('加載中…', true);
+  for (let i=0; i<INDS.length; i++) {
+    const ind = INDS[i];
+    setStatus(`${ind.series} (${i+1}/${INDS.length})`, true);
+    try { await fetchInd(ind); } catch(e) {
+      console.warn(ind.series, e.message);
+      S.data[ind.series] = {error:true}; S.hist[ind.series] = [];
+    }
+    updateRow(ind);
+    updateCbScore(ind);
+    await delay(85);
+  }
+  updateOverall();
+  updateChart();
+  document.getElementById('hd-updated').textContent = '更新: '+new Date().toLocaleTimeString('zh-TW');
+  setStatus('已更新 ✓', false);
+  btn.disabled = false;
+  S.busy = false;
+}
+
+/* ─── STATUS ─── */
+function setStatus(txt, loading) {
+  const el = document.getElementById('hd-status');
+  el.innerHTML = loading ? `<span class="spin"></span> ${txt}` : txt;
+}
+
+/* ─── TABLE ─── */
+function buildTable() {
+  const tbody = document.getElementById('tbl-body');
+  tbody.innerHTML = '';
+  let lastGrp = null;
+  INDS.forEach(ind => {
+    if (ind.grp !== lastGrp) {
+      lastGrp = ind.grp;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="8" style="padding:0"><div class="grp-hdr">${GRPS[ind.grp]}</div></td>`;
+      tbody.appendChild(tr);
+    }
+    const tr = document.createElement('tr');
+    tr.id = 'r-'+ind.series;
+    tr.innerHTML = `
+      <td class="c-no">${ind.no}</td>
+      <td class="c-ser">${ind.series}</td>
+      <td class="c-name">${ind.cn}<small>${ind.en}</small></td>
+      <td class="c-val"><span class="loading-ph">…</span></td>
+      <td class="c-date hide-sm"><span class="loading-ph">…</span></td>
+      <td class="c-trend"><span class="trend-f">–</span></td>
+      <td><span class="loading-ph">…</span></td>
+      <td class="hide-sm"><span class="loading-ph">…</span></td>
+    `;
+    tr.addEventListener('mouseenter', e=>showTT(e, ind));
+    tr.addEventListener('mousemove',  e=>moveTT(e));
+    tr.addEventListener('mouseleave', hideTT);
+    tbody.appendChild(tr);
+  });
+}
+
+function updateRow(ind) {
+  const tr = document.getElementById('r-'+ind.series);
+  if (!tr) return;
+  const td = tr.querySelectorAll('td');
+  const d  = S.data[ind.series];
+  if (!d || d.error) {
+    td[3].innerHTML = '<span class="err-ph">N/A</span>';
+    td[4].innerHTML = '—'; td[5].innerHTML = '<span class="trend-f">–</span>';
+    td[6].innerHTML = '—'; td[7].innerHTML = '—';
+    return;
+  }
+  const tr_sym = d.trend==='u'?'↑':d.trend==='d'?'↓':'→';
+  const tr_cls = d.trend==='u'?'trend-u':d.trend==='d'?'trend-d':'trend-f';
+  const bull  = (ind.fav==='up'&&d.trend==='u')||(ind.fav==='down'&&d.trend==='d');
+  const bear  = (ind.fav==='up'&&d.trend==='d')||(ind.fav==='down'&&d.trend==='u');
+  const vcls  = bull?'val-bull':bear?'val-bear':'';
+  const sc    = d.score;
+  const bcls  = sc===null?'b-mi':sc>=7?'b-hi':sc>=4?'b-mi':'b-lo';
+  const sg    = sc===null?{t:'—',c:''}:sc>=7?{t:'看漲 ↑',c:'sg-bull'}:sc>=4?{t:'中性 →',c:'sg-neu'}:{t:'看跌 ↓',c:'sg-bear'};
+  td[3].innerHTML = `<span class="${vcls}">${d.str}</span>`;
+  td[4].innerHTML = `<span class="c-date">${d.date||'—'}</span>`;
+  td[5].innerHTML = `<span class="${tr_cls}">${tr_sym}</span>`;
+  td[6].innerHTML = sc!==null ? `<span class="badge ${bcls}">${sc.toFixed(1)}</span>` : '<span class="err-ph">—</span>';
+  td[7].innerHTML = `<span class="sig ${sg.c}">${sg.t}</span>`;
+}
+
+/* ─── OVERALL SCORE ─── */
+function updateOverall() {
+  const scores = INDS.map(i=>S.data[i.series]?.score).filter(s=>s!=null);
+  if (!scores.length) return;
+  const avg = scores.reduce((a,b)=>a+b,0)/scores.length;
+  const val = avg.toFixed(1);
+  const isHi = avg>=7, isLo = avg<4;
+  const col = isHi?'var(--green)':isLo?'var(--red)':'var(--gold)';
+  const glow = isHi?'0 0 18px #2eba6244':isLo?'0 0 18px #f0484844':'0 0 18px #d4a01744';
+  const lbl = isHi?'市場環境偏多：風險資產獲支撐':isLo?'市場環境偏空：注意下行風險':'市場環境中性：謹慎觀望';
+  document.getElementById('sb-num').textContent = val;
+  document.getElementById('sb-num').style.color = col;
+  document.getElementById('sb-circle').style.borderColor = col;
+  document.getElementById('sb-circle').style.boxShadow = glow;
+  document.getElementById('sb-signal').textContent = lbl;
+  document.getElementById('sg-fill').style.width = (avg/10*100)+'%';
+}
+
+/* ─── CHART ─── */
+function initChart() {
+  const ctx = document.getElementById('myChart').getContext('2d');
+  S.chart = new Chart(ctx, {
+    type:'line',
+    data:{ datasets:[] },
+    options:{
+      responsive:true, maintainAspectRatio:true,
+      interaction:{ mode:'index', intersect:false },
+      animation:{ duration:250 },
+      scales:{
+        x:{
+          type:'time',
+          time:{ unit:'month', displayFormats:{ month:'MMM yy' } },
+          grid:{ color:'#1e2d4766' },
+          ticks:{ color:'#3d5068', font:{ size:10 }, maxTicksLimit:8 }
+        },
+        y:{
+          min:0, max:10,
+          grid:{ color:'#1e2d4766' },
+          ticks:{ color:'#3d5068', font:{ size:10 }, stepSize:2, callback:v=>v }
+        }
+      },
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          backgroundColor:'#162036', borderColor:'#253655', borderWidth:1,
+          titleColor:'#c9d5e3', bodyColor:'#6a7d96', padding:10,
+          callbacks:{ label:c=>` ${c.dataset.label}: ${c.parsed.y.toFixed(1)}` }
+        }
+      }
+    }
+  });
+}
+
+function updateChart() {
+  if (!S.chart) return;
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate()-S.range);
+  const datasets = [];
+  let ci = 0;
+  // Reference line at y=5
+  datasets.push({
+    label:'中性線', data:[{x:cutoff,y:5},{x:new Date(),y:5}],
+    borderColor:'#1e2d47', borderWidth:1, borderDash:[4,4],
+    pointRadius:0, fill:false, tension:0, order:99
+  });
+  INDS.forEach(ind => {
+    if (!S.checked.has(ind.series)) return;
+    const hist = S.hist[ind.series];
+    if (!hist || !hist.length) return;
+    const data = hist.filter(p=>p.x>=cutoff);
+    if (!data.length) return;
+    const col = COLORS[ci%COLORS.length]; ci++;
+    datasets.push({
+      label:ind.cn, data, seriesId:ind.series,
+      borderColor:col, backgroundColor:col+'18',
+      borderWidth:1.8, pointRadius:0, pointHoverRadius:4,
+      tension:0.3, fill:false
+    });
+  });
+  S.chart.data.datasets = datasets;
+  S.chart.update();
+}
+
+function setRange(d, btn) {
+  S.range = d;
+  document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  updateChart();
+}
+
+/* ─── CHECKBOXES ─── */
+function buildCheckboxes() {
+  const panel = document.getElementById('cb-panel');
+  panel.innerHTML = '';
+  let lastGrp = null, ci = 0;
+  INDS.forEach((ind,i) => {
+    const col = COLORS[i%COLORS.length];
+    if (ind.grp !== lastGrp) {
+      lastGrp = ind.grp;
+      const lbl = document.createElement('div');
+      lbl.className = 'cb-grp'; lbl.textContent = GRPS[ind.grp];
+      panel.appendChild(lbl);
+    }
+    if (ind.def) S.checked.add(ind.series);
+    const item = document.createElement('div');
+    item.className = 'cb-item';
+    item.innerHTML = `
+      <input type="checkbox" id="cb-${ind.series}" ${ind.def?'checked':''}
+        onchange="toggleSeries('${ind.series}')">
+      <div class="cb-dot" style="background:${col}"></div>
+      <label class="cb-lbl" for="cb-${ind.series}">${ind.cn}</label>
+      <span class="cb-sc" id="cbs-${ind.series}" style="color:var(--muted)">—</span>
+    `;
+    panel.appendChild(item);
+    ci++;
+  });
+}
+
+function toggleSeries(series) {
+  S.checked.has(series) ? S.checked.delete(series) : S.checked.add(series);
+  updateChart();
+}
+
+function updateCbScore(ind) {
+  const el = document.getElementById('cbs-'+ind.series);
+  if (!el) return;
+  const d = S.data[ind.series];
+  if (!d||d.error||d.score==null) { el.textContent='—'; el.style.color='var(--muted)'; return; }
+  el.textContent = d.score.toFixed(1);
+  el.style.color = d.score>=7?'var(--green)':d.score>=4?'var(--gold)':'var(--red)';
+}
+
+/* ─── TOOLTIP ─── */
+function showTT(e, ind) {
+  const t = document.getElementById('tooltip');
+  document.getElementById('tt-h').textContent = `${ind.cn} (${ind.series})`;
+  document.getElementById('tt-p').textContent = ind.desc;
+  t.style.display='block';
+  setTimeout(()=>t.style.opacity='1',10);
+  moveTT(e);
+}
+function moveTT(e) {
+  const t = document.getElementById('tooltip');
+  let x=e.clientX+14, y=e.clientY+14;
+  if (x+280>window.innerWidth) x=e.clientX-295;
+  if (y+120>window.innerHeight) y=e.clientY-130;
+  t.style.left=x+'px'; t.style.top=y+'px';
+}
+function hideTT() {
+  const t=document.getElementById('tooltip');
+  t.style.opacity='0';
+  setTimeout(()=>t.style.display='none',150);
+}
+
+/* ─── INIT ─── */
+function initDashboard(keyOverride) {
+  const key = keyOverride || document.getElementById('setup-input').value.trim();
+  if (!key) { alert('請輸入 FRED API Key'); return; }
+  S.apiKey = key;
+  localStorage.setItem('macroDashKey', key);
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'flex';
+  document.getElementById('hd-key').value = '••••••••';
+  buildTable();
+  buildCheckboxes();
+  initChart();
+  refreshAll();
+}
+
+// Update API key from header input
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('hd-key').addEventListener('change', function() {
+    const k = this.value.trim();
+    if (k && k !== '••••••••') { S.apiKey=k; localStorage.setItem('macroDashKey',k); }
+  });
+  // Setup input: Enter key
+  document.getElementById('setup-input').addEventListener('keydown', e=>{
+    if(e.key==='Enter') initDashboard();
+  });
+  // Auto-load saved key
+  const saved = localStorage.getItem('macroDashKey');
+  if (saved) initDashboard(saved);
+});
+</script>
+</body>
+</html>
