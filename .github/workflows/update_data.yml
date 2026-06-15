@@ -1,0 +1,44 @@
+name: 📊 Update Macro Dashboard Data
+
+on:
+  schedule:
+    # 每個工作日 UTC 06:00 執行（台灣時間下午 2 點）
+    - cron: '0 6 * * 1-5'
+  workflow_dispatch:  # 允許手動觸發
+
+permissions:
+  contents: write   # 允許 push data.json 回 repo
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 📦 Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🔄 Fetch macro data
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python fetch_data.py
+
+      - name: 📤 Commit and push data.json
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add data.json
+          # 只在有變動時才 commit
+          git diff --staged --quiet && echo "No changes, skipping commit" || \
+          (git commit -m "📊 Update macro data [$(date -u '+%Y-%m-%d %H:%M UTC')]" && git push)
