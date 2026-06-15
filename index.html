@@ -16,33 +16,25 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:13px}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,'PingFang TC','Microsoft JhengHei','Segoe UI',sans-serif;min-height:100vh;line-height:1.5}
-a{color:var(--cyan);text-decoration:none}button{cursor:pointer;font-family:inherit;font-size:12px}
+a{color:var(--cyan)}button{cursor:pointer;font-family:inherit;font-size:12px}
 ::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
-/* ── SETUP ── */
-#setup-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-.setup-card{background:var(--s1);border:1px solid var(--border2);border-radius:12px;padding:36px 32px;max-width:560px;width:100%;text-align:center}
-.setup-logo{font-size:42px;margin-bottom:10px;filter:drop-shadow(0 0 16px #00cfff55)}
-.setup-card h1{font-size:20px;font-weight:700;color:#fff;margin-bottom:4px}
-.setup-card>p{color:var(--dim);font-size:12px;margin-bottom:18px}
-.src-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
-.src-pill{border-radius:20px;padding:4px 11px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;border:1px solid}
-.sp-free{color:var(--green);border-color:#2eba6244;background:var(--green-dim)}
-.sp-key{color:var(--cyan);border-color:#00cfff33;background:var(--cyan-dim)}
-.sp-opt{color:var(--gold);border-color:#d4a01733;background:var(--gold-dim)}
-.setup-block{background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:13px 14px;margin-bottom:10px;text-align:left}
-.setup-block-label{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--dim);margin-bottom:6px;display:flex;align-items:center;gap:6px}
-.setup-block-label .req{font-size:9px;background:var(--red-dim);color:var(--red);padding:1px 5px;border-radius:8px}
-.setup-block-label .opt{font-size:9px;background:var(--gold-dim);color:var(--gold);padding:1px 5px;border-radius:8px}
-.setup-row{display:flex;gap:8px}
-.setup-row input{flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;outline:none;transition:border-color .15s}
-.setup-row input:focus{border-color:var(--cyan)}
-.setup-row input.optional:focus{border-color:var(--gold)}
-.setup-link{font-size:10px;color:var(--muted);margin-top:4px}
-.setup-link a{color:var(--cyan)}
-.setup-start{width:100%;margin-top:14px;padding:10px;border-radius:8px;border:none;background:var(--cyan);color:#000;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s}
-.setup-start:hover{background:#00b8e8}
-.setup-hint{font-size:10px;color:var(--muted);margin-top:10px}
+/* ── LOADING ── */
+#loading{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:14px}
+.ld-logo{font-size:48px;filter:drop-shadow(0 0 20px #00cfff55)}
+.ld-title{font-size:18px;font-weight:700;color:#fff}
+.ld-msg{font-size:12px;color:var(--dim)}
+.ld-bar{width:240px;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.ld-fill{height:100%;background:var(--cyan);border-radius:2px;animation:ldpulse 1.5s ease-in-out infinite}
+@keyframes ldpulse{0%{width:0%}50%{width:80%}100%{width:100%}}
+
+/* ── NO-DATA SCREEN ── */
+#no-data{display:none;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.nd-card{background:var(--s1);border:1px solid var(--border2);border-radius:12px;padding:36px;max-width:560px;width:100%;text-align:center}
+.nd-card h2{font-size:18px;color:#fff;margin-bottom:10px}
+.nd-card p{color:var(--dim);font-size:12px;line-height:1.8;margin-bottom:16px}
+.nd-steps{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:left;font-size:11px;color:var(--dim);line-height:2}
+.nd-steps code{background:var(--border);padding:1px 5px;border-radius:3px;font-family:monospace;color:var(--text);font-size:11px}
 
 /* ── DASHBOARD ── */
 #dashboard{display:none;flex-direction:column;height:100vh;overflow:hidden}
@@ -50,17 +42,15 @@ a{color:var(--cyan);text-decoration:none}button{cursor:pointer;font-family:inher
 /* ── HEADER ── */
 #header{background:var(--s1);border-bottom:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0}
 .hd-title{font-size:14px;font-weight:700;color:#fff;white-space:nowrap}.hd-title span{color:var(--cyan)}
-.spills{display:flex;gap:4px}
-.spill{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--card);border:1px solid var(--border2);color:var(--muted);cursor:default}
+.src-pills{display:flex;gap:4px;flex-wrap:wrap}
+.spill{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--card);border:1px solid var(--border2);color:var(--muted)}
 .spill.ok{color:var(--green);border-color:#2eba6244;background:var(--green-dim)}
 .spill.er{color:var(--red);border-color:#f0484844;background:var(--red-dim)}
-.spill.na{color:var(--gold);border-color:#d4a01744;background:var(--gold-dim)}
 .btn{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:4px;border:1px solid var(--border2);background:var(--card);color:var(--text);font-size:11px;transition:background .15s;white-space:nowrap}
 .btn:hover{background:var(--border2)}.btn:disabled{opacity:.45;cursor:not-allowed}
 .btn-p{background:var(--cyan);border-color:var(--cyan);color:#000;font-weight:700}.btn-p:hover{background:#00b8e8}
-.btn-sm{padding:3px 9px;font-size:10px}
-#hd-status{font-size:10px;color:var(--muted);min-width:0}
-#hd-updated{font-size:10px;color:var(--muted);margin-left:auto;white-space:nowrap}
+#hd-status{font-size:10px;color:var(--muted)}
+#hd-updated{font-size:10px;color:var(--dim);margin-left:auto;white-space:nowrap}
 
 /* ── SCORE BAR ── */
 #score-bar{background:var(--s2);border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;flex-shrink:0}
@@ -79,8 +69,8 @@ a{color:var(--cyan);text-decoration:none}button{cursor:pointer;font-family:inher
 #main{display:flex;flex:1;overflow:hidden}
 #table-panel{flex:1;overflow-y:auto;border-right:1px solid var(--border);min-width:0}
 .grp-hdr{background:var(--s1);padding:5px 12px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:6px}
-.src-badge{font-size:9px;font-weight:600;padding:1px 5px;border-radius:8px;border:1px solid}
-.sb-fred{color:#4d9ef0;border-color:#4d9ef033}.sb-cg{color:var(--green);border-color:#2eba6233}.sb-td{color:var(--gold);border-color:#d4a01733}.sb-nyfed{color:#a371f7;border-color:#a371f733}.sb-tsy{color:#f0883e;border-color:#f0883e33}
+.src-badge{font-size:9px;font-weight:600;padding:1px 5px;border-radius:8px;border:1px solid;color:var(--dim);border-color:var(--border)}
+.sb-fred{color:#4d9ef0;border-color:#4d9ef033}.sb-yahoo{color:var(--gold);border-color:#d4a01733}.sb-cg{color:var(--green);border-color:#2eba6233}.sb-nyfed{color:#a371f7;border-color:#a371f733}.sb-tsy{color:#f0883e;border-color:#f0883e33}
 #ind-table{width:100%;border-collapse:collapse}
 #ind-table thead{position:sticky;top:24px;z-index:4;background:var(--s1)}
 #ind-table th{padding:6px 10px;text-align:left;font-size:10px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
@@ -88,7 +78,6 @@ a{color:var(--cyan);text-decoration:none}button{cursor:pointer;font-family:inher
 #ind-table tbody tr:hover td{background:var(--s2)}
 .c-no{color:var(--muted);font-size:10px;width:26px}
 .c-ser{font-family:'SFMono-Regular',Consolas,monospace;font-size:10px;white-space:nowrap}
-.ser-fred{color:#4d9ef0}.ser-cg{color:var(--green)}.ser-td{color:var(--gold)}.ser-nyfed{color:#a371f7}.ser-tsy{color:#f0883e}
 .c-name{font-weight:500;font-size:12px}.c-name small{display:block;font-size:10px;color:var(--muted)}
 .c-val{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;font-weight:600;white-space:nowrap}
 .c-date{font-size:10px;color:var(--muted);white-space:nowrap}
@@ -98,7 +87,7 @@ a{color:var(--cyan);text-decoration:none}button{cursor:pointer;font-family:inher
 .b-hi{background:var(--green-dim);color:var(--green)}.b-mi{background:var(--gold-dim);color:var(--gold)}.b-lo{background:var(--red-dim);color:var(--red)}
 .sig{display:inline-flex;align-items:center;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700}
 .sg-bull{background:var(--green-dim);color:var(--green)}.sg-neu{background:var(--gold-dim);color:var(--gold)}.sg-bear{background:var(--red-dim);color:var(--red)}
-.loading-ph{color:var(--muted);font-size:10px}.err-ph{color:var(--muted);font-size:10px;font-style:italic}
+.err-ph{color:var(--muted);font-size:10px;font-style:italic}
 
 /* ── CHART ── */
 #chart-panel{width:400px;min-width:300px;flex-shrink:0;display:flex;flex-direction:column}
@@ -107,8 +96,7 @@ a{color:var(--cyan);text-decoration:none}button{cursor:pointer;font-family:inher
 .range-btns{display:flex;gap:3px}
 .rbtn{padding:3px 8px;font-size:10px;border:1px solid var(--border2);border-radius:4px;background:none;color:var(--dim)}
 .rbtn.active{background:var(--cyan);border-color:var(--cyan);color:#000;font-weight:700}
-#chart-wrap{padding:10px;flex-shrink:0}
-#chart-wrap canvas{width:100%!important}
+#chart-wrap{padding:10px;flex-shrink:0}#chart-wrap canvas{width:100%!important}
 #cb-panel{flex:1;overflow-y:auto;padding:6px 12px 12px;border-top:1px solid var(--border)}
 .cb-grp{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;margin:10px 0 4px}
 .cb-item{display:flex;align-items:center;gap:6px;padding:3px 0}
@@ -116,22 +104,6 @@ a{color:var(--cyan);text-decoration:none}button{cursor:pointer;font-family:inher
 .cb-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 .cb-lbl{font-size:11px;color:var(--dim);flex:1;cursor:pointer}
 .cb-sc{font-size:11px;font-weight:700;min-width:28px;text-align:right}
-
-/* ── KEY MODAL ── */
-#key-modal{display:none;position:fixed;inset:0;background:#000a;z-index:500;align-items:center;justify-content:center}
-.km-box{background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:26px;width:480px;max-width:90vw}
-.km-box h3{font-size:15px;margin-bottom:14px;color:#fff}
-.km-field{margin-bottom:12px}
-.km-label{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--dim);letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;gap:6px}
-.km-label .req{font-size:9px;background:var(--red-dim);color:var(--red);padding:1px 5px;border-radius:8px}
-.km-label .opt{font-size:9px;background:var(--gold-dim);color:var(--gold);padding:1px 5px;border-radius:8px}
-.km-field input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:9px 12px;border-radius:6px;font-size:13px;outline:none}
-.km-field input:focus{border-color:var(--cyan)}
-.km-hint{font-size:10px;color:var(--muted);margin-top:4px}
-.km-hint a{color:var(--cyan)}
-.km-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
-#key-err{display:none;background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:6px;padding:8px 12px;font-size:11px;margin:0 14px;align-items:center;gap:8px}
-#key-err button{background:var(--red);color:#fff;border:none;padding:3px 9px;border-radius:4px;font-size:10px;cursor:pointer}
 
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{display:inline-block;width:10px;height:10px;border:2px solid var(--border2);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite}
@@ -145,69 +117,51 @@ a{color:var(--cyan);text-decoration:none}button{cursor:pointer;font-family:inher
 </head>
 <body>
 
-<!-- ═══ SETUP ═══ -->
-<div id="setup-screen">
-  <div class="setup-card">
-    <div class="setup-logo">📊</div>
-    <h1>宏觀經濟儀表板</h1>
-    <p>32 項即時指標 · 四大數據來源 · 0-10 綜合評分</p>
-    <div class="src-row">
-      <div class="src-pill sp-key">🏦 FRED <span>必填</span></div>
-      <div class="src-pill sp-free">🪙 CoinGecko <span>免費無需Key</span></div>
-      <div class="src-pill sp-free">🏛️ NY Fed/Treasury <span>免費無需Key</span></div>
-      <div class="src-pill sp-opt">📈 Twelve Data <span>可選・即時</span></div>
-    </div>
+<!-- LOADING -->
+<div id="loading">
+  <div class="ld-logo">📊</div>
+  <div class="ld-title">宏觀經濟儀表板</div>
+  <div class="ld-bar"><div class="ld-fill"></div></div>
+  <div class="ld-msg" id="ld-msg">正在載入數據…</div>
+</div>
 
-    <div class="setup-block">
-      <div class="setup-block-label">🏦 FRED API Key <span class="req">必填</span></div>
-      <div class="setup-row">
-        <input type="password" id="setup-fred" placeholder="貼入 FRED API Key…" autocomplete="off"/>
-      </div>
-      <div class="setup-link">申請：<a href="https://fred.stlouisfed.org/docs/api/api_key.html" target="_blank">fred.stlouisfed.org</a> → 免費註冊 → My Account → API Keys（2分鐘）</div>
+<!-- NO DATA -->
+<div id="no-data">
+  <div class="nd-card">
+    <div style="font-size:40px;margin-bottom:12px">⚙️</div>
+    <h2>尚未有數據（data.json 不存在）</h2>
+    <p>本儀表板使用 <strong>GitHub Actions</strong> 每日自動抓取數據。<br>請按照以下步驟完成初次設定：</p>
+    <div class="nd-steps">
+      <strong>① 在 GitHub Repo 設定 Secret</strong><br>
+      Settings → Secrets and variables → Actions → New repository secret<br>
+      名稱：<code>FRED_API_KEY</code>　值：你的 FRED API Key<br><br>
+      <strong>② 手動執行一次 GitHub Actions</strong><br>
+      Actions → 「📊 Update Macro Dashboard Data」→ Run workflow<br><br>
+      <strong>③ 等待 data.json 生成後刷新頁面</strong><br>
+      約 2–3 分鐘後，數據就會自動出現。之後每個工作日 14:00（台灣）自動更新。
     </div>
-
-    <div class="setup-block">
-      <div class="setup-block-label">📈 Twelve Data API Key <span class="opt">可選</span></div>
-      <div class="setup-row">
-        <input type="password" id="setup-td" placeholder="貼入 Twelve Data Key（可不填）" autocomplete="off" class="optional"/>
-      </div>
-      <div class="setup-link">可選：<a href="https://twelvedata.com" target="_blank">twelvedata.com</a> → 免費申請（800次/天）→ 黃金・白銀・原油・DXY・VIX 即時價格</div>
-    </div>
-
-    <button class="setup-start" onclick="initDashboard()">開始載入 →</button>
-    <p class="setup-hint">所有 Key 僅儲存於此瀏覽器 localStorage，不上傳任何伺服器。CoinGecko / NY Fed / Treasury 無需 Key 自動連接。</p>
   </div>
 </div>
 
-<!-- ═══ DASHBOARD ═══ -->
+<!-- DASHBOARD -->
 <div id="dashboard">
-
-  <!-- KEY ERROR BANNER -->
-  <div id="key-err">
-    ⚠️ <strong>FRED API Key 無效</strong> — 請重新輸入有效的 Key
-    <button onclick="openKeyModal()">換 Key</button>
-  </div>
-
-  <!-- HEADER -->
   <div id="header">
     <span class="hd-title">📊 <span>MACRO</span> DASHBOARD</span>
-    <div class="spills">
-      <span class="spill" id="spill-fred" title="FRED API">FRED</span>
-      <span class="spill" id="spill-cg" title="CoinGecko">CG</span>
-      <span class="spill" id="spill-nyfed" title="NY Fed">NYFED</span>
-      <span class="spill" id="spill-tsy" title="US Treasury">TSY</span>
-      <span class="spill" id="spill-td" title="Twelve Data">TD</span>
+    <div class="src-pills">
+      <span class="spill" id="sp-fred">FRED</span>
+      <span class="spill" id="sp-yahoo">Yahoo Finance</span>
+      <span class="spill" id="sp-cg">CoinGecko</span>
+      <span class="spill" id="sp-nyfed">NY Fed</span>
+      <span class="spill" id="sp-tsy">Treasury</span>
     </div>
-    <button class="btn btn-sm" onclick="openKeyModal()">🔑 管理 Key</button>
-    <button class="btn btn-p" id="refresh-btn" onclick="refreshAll()">↻ 更新</button>
-    <span id="hd-status">就緒</span>
+    <button class="btn btn-p" id="refresh-btn" onclick="reloadData()">↻ 刷新</button>
+    <span id="hd-status"></span>
     <span id="hd-updated"></span>
   </div>
 
-  <!-- SCORE BAR -->
   <div id="score-bar">
     <div class="sb-circle" id="sb-circle"><span id="sb-num">—</span><span id="sb-den">/ 10</span></div>
-    <div class="sb-info"><div class="sb-label">綜合市場評分</div><div id="sb-signal">計算中 …</div></div>
+    <div class="sb-info"><div class="sb-label">綜合市場評分</div><div id="sb-signal">—</div></div>
     <div class="sb-gauge">
       <div class="sg-labels"><span>極度不利</span><span>中性</span><span>極度有利</span></div>
       <div class="sg-track"><div class="sg-fill" id="sg-fill"></div></div>
@@ -215,12 +169,11 @@ a{color:var(--cyan);text-decoration:none}button{cursor:pointer;font-family:inher
     <div class="sb-legend hide-sm"><span>🔴 0–3 看跌</span><span>🟡 4–6 中性</span><span>🟢 7–10 看漲</span></div>
   </div>
 
-  <!-- MAIN -->
   <div id="main">
     <div id="table-panel">
       <table id="ind-table">
         <thead><tr>
-          <th class="c-no">No</th><th>指標代碼</th><th>名稱</th>
+          <th class="c-no">No</th><th>指標</th><th>名稱</th>
           <th>當前值</th><th class="hide-sm">日期</th>
           <th>趨</th><th>評分</th><th class="hide-sm">信號</th>
         </tr></thead>
@@ -243,605 +196,169 @@ a{color:var(--cyan);text-decoration:none}button{cursor:pointer;font-family:inher
   </div>
 </div>
 
-<!-- KEY MODAL -->
-<div id="key-modal" onclick="if(event.target===this)closeKeyModal()">
-  <div class="km-box">
-    <h3>🔑 管理 API Key</h3>
-    <div class="km-field">
-      <div class="km-label">FRED API Key <span class="req">必填</span></div>
-      <input type="password" id="m-fred" placeholder="貼入 FRED API Key…" autocomplete="off"/>
-      <div class="km-hint">申請：<a href="https://fred.stlouisfed.org/docs/api/api_key.html" target="_blank">fred.stlouisfed.org</a> → 免費</div>
-    </div>
-    <div class="km-field">
-      <div class="km-label">Twelve Data Key <span class="opt">可選</span></div>
-      <input type="password" id="m-td" placeholder="Twelve Data Key（可不填，黃金/原油/VIX即時）" autocomplete="off"/>
-      <div class="km-hint">申請：<a href="https://twelvedata.com" target="_blank">twelvedata.com</a> → 免費 800次/天 → 黃金・白銀・原油・DXY・VIX</div>
-    </div>
-    <div class="km-actions">
-      <button class="btn btn-sm" onclick="closeKeyModal()">取消</button>
-      <button class="btn btn-p btn-sm" onclick="applyKeys()">確認並重新載入 →</button>
-    </div>
-  </div>
-</div>
-
 <div id="tooltip" style="display:none"><h4 id="tt-h"></h4><p id="tt-p"></p><div class="tt-src" id="tt-src"></div></div>
 
 <script>
 'use strict';
-const COLORS=['#00cfff','#3fb950','#f85149','#d29922','#8957e5','#f0883e','#39d353','#ff7b72','#79c0ff','#d2a8ff','#ffa657','#7ee787','#a9d6fb','#e3b341','#ff6e76','#ffdf5d','#9ecbff','#58a6ff','#56d364','#ff8c00','#a371f7','#2ea043','#6495ed','#da70d6','#20b2aa','#ffb6c1','#7b68ee','#00fa9a','#ff7f50','#40e0d0','#98fb98','#dda0dd'];
+const COLORS=['#00cfff','#3fb950','#f85149','#d29922','#8957e5','#f0883e','#39d353','#ff7b72','#79c0ff','#d2a8ff','#ffa657','#7ee787','#a9d6fb','#e3b341','#ff6e76','#ffdf5d','#9ecbff','#58a6ff','#56d364','#ff8c00','#a371f7','#2ea043','#6495ed','#da70d6','#20b2aa','#ffb6c1','#7b68ee','#00fa9a','#ff7f50','#40e0d0'];
 
-// Source metadata
-const SRC_META={
-  fred:{label:'FRED API',cls:'sb-fred',serCls:'ser-fred'},
-  cg:{label:'CoinGecko',cls:'sb-cg',serCls:'ser-cg'},
-  td:{label:'Twelve Data',cls:'sb-td',serCls:'ser-td'},
-  nyfed:{label:'NY Fed API',cls:'sb-nyfed',serCls:'ser-nyfed'},
-  treasury:{label:'US Treasury FiscalData',cls:'sb-tsy',serCls:'ser-tsy'}
-};
-
-const GRPS={sentiment:'市場情緒',commodities:'商品原物料',crypto:'加密貨幣市占',market:'市場指標',us_broad:'美國廣義利率',liquidity:'Fed 流動性',us_rates:'美國利率',global:'全球央行利率'};
-const GRPS_SRC={sentiment:'fred',commodities:'auto',crypto:'cg',market:'auto',us_broad:'fred',liquidity:'mixed',us_rates:'fred',global:'fred'};
-
-// ─── INDICATORS ───────────────────────────────────────────────
-// src: 'fred' | 'cg' | 'nyfed' | 'treasury'
-// tdSym: if set AND S.tdKey exists, use Twelve Data with this symbol (fallback: fred)
-// fredSer: overrides series for FRED fetching (use when series key is a virtual alias)
-const INDS=[
-  // 1 VIX
-  {no:1,grp:'sentiment',series:'VIXCLS',src:'fred',tdSym:'VIX',
-   cn:'恐慌指數（波動率指標）',en:'VIX Fear Index',unit:'',fav:'down',freq:'daily',
-   desc:'VIX < 20 情緒良好 | VIX 20–30 恐懼上升 | VIX > 30 恐慌・可能有系統風險 | 急拉代表重大事件',def:true},
-  // 2-5 Commodities
-  {no:2,grp:'commodities',series:'GOLDAMGBD228NLBM',src:'fred',tdSym:'XAU/USD',
-   cn:'黃金 (GOLD)',en:'Gold – Twelve Data(real-time) / FRED London PM Fix',unit:'$',fav:'down',freq:'daily',
-   desc:'黃金下降 = 市場越險需求低・風險偏好上升 | 黃金上升 = 避險需求增強・資金流出風險資產',def:false},
-  {no:3,grp:'commodities',series:'PSILVERUSDM',src:'fred',tdSym:'XAG/USD',
-   cn:'白銀 (SILVER)',en:'Silver – Twelve Data(real-time) / FRED monthly',unit:'$',fav:'down',freq:'monthly',
-   desc:'白銀下降 = 市場越險需求低・風險偏好上升',def:false},
-  {no:4,grp:'commodities',series:'DCOILWTICO',src:'fred',tdSym:'WTI/USD',
-   cn:'原油 WTI (CL1!)',en:'WTI Crude – Twelve Data(real-time) / FRED daily',unit:'$',fav:'down',freq:'daily',
-   desc:'油價下降 = 通脹壓力減少・商品成本降低 → 有利市場',def:false},
-  {no:5,grp:'commodities',series:'DCOILBRENTEU',src:'fred',tdSym:'BRENT/USD',
-   cn:'原油 Brent (BRENT)',en:'Brent Crude – Twelve Data(real-time) / FRED daily',unit:'$',fav:'down',freq:'daily',
-   desc:'Brent 油價下降 = 通脹壓力減少 → 有利市場',def:false},
-  // 6 BTC.D (CoinGecko)
-  {no:6,grp:'crypto',series:'BTC.D',src:'cg',
-   cn:'比特幣市占率 (BTC.D)',en:'Bitcoin Dominance – CoinGecko',unit:'%',fav:'down',freq:'live',
-   desc:'BTC.D 上升 = 資金停在BTC・加密市場集中 | 下降 = 資金流向山寨幣・風險偏好上升',def:false},
-  // 7 DXY
-  {no:7,grp:'market',series:'DTWEXBGS',src:'fred',tdSym:'DXY',
-   cn:'美元指數 DXY (DTWEXBGS)',en:'Dollar Index – Twelve Data(real-time) / FRED Broad',unit:'',fav:'down',freq:'daily',
-   desc:'美元下降 = 全球流動性改善・新興市場壓力減少 → 有利風險資產',def:false},
-  // 8-10 Crypto (CoinGecko)
-  {no:8,grp:'crypto',series:'OTHERS.D',src:'cg',
-   cn:'山寨幣市占率 (OTHERS.D)',en:'Altcoin Dominance – CoinGecko',unit:'%',fav:'up',freq:'live',
-   desc:'山寨幣市占率上升 = 資金流向山寨市場・風險偏好極度上升（Alt Season）',def:false},
-  {no:9,grp:'crypto',series:'USDC.D',src:'cg',
-   cn:'穩定幣市占率 USDC',en:'USDC Dominance – CoinGecko',unit:'%',fav:'down',freq:'live',
-   desc:'穩定幣市占率下降 = 資金流入風險資產 → 看漲 | 上升 = 市場恐懼',def:false},
-  {no:10,grp:'crypto',series:'USDT.D',src:'cg',
-   cn:'穩定幣市占率 USDT',en:'USDT Dominance – CoinGecko',unit:'%',fav:'down',freq:'live',
-   desc:'穩定幣市占率下降 = 資金投入風險資產 → 看漲 | 上升 = 恐懼持幣觀望',def:false},
-  // 11 USINTR
-  {no:11,grp:'us_broad',series:'USINTR',src:'fred',fredSer:'FEDFUNDS',
-   cn:'美國利率（廣義）USINTR',en:'US Interest Rate – FRED Fed Funds proxy',unit:'%',fav:'down',freq:'monthly',
-   desc:'反映美國廣義利率環境 | 降息 = 借貸成本降低・資金流向風險資產',def:false},
-  // 12-17 Liquidity
-  {no:12,grp:'liquidity',series:'WALCL',src:'fred',
-   cn:'美聯儲資產負債表 (WALCL)',en:'Fed Balance Sheet – FRED weekly',unit:'M$',fav:'up',freq:'weekly',
-   desc:'擴表(QE) = 放水 → 利好市場 | 縮表(QT) = 收水 → 不利市場',def:true},
-  {no:13,grp:'liquidity',series:'M2SL',src:'fred',
-   cn:'美國 M2 貨幣供給量 (M2SL)',en:'M2 Money Supply – FRED monthly',unit:'B$',fav:'up',freq:'monthly',
-   desc:'M2 成長 = 市場「能用的錢」增多 → 資產價格獲支撐',def:false},
-  // ★ Row 14: TGA → US Treasury FiscalData (更即時)
-  {no:14,grp:'liquidity',series:'TGA',src:'treasury',
-   cn:'財政部一般賬戶 TGA (WTREGEN)',en:'TGA – US Treasury FiscalData (daily, 1-day faster than FRED)',unit:'M$',fav:'down',freq:'daily',
-   desc:'TGA 下降 = 政府花錢「放回市場」→ 流動性注入(bullish) | 上升 = 從市場「回收資金」(bearish)',def:false},
-  // ★ Rows 15-17: RRPONTSYD → NY Fed API (更即時)
-  {no:15,grp:'liquidity',series:'RRP_AMT',src:'nyfed',
-   cn:'隔夜逆回購每日 (RRPONTSYD)',en:'ON RRP – NY Fed API (1-day faster than FRED)',unit:'M$',fav:'down',freq:'daily',
-   desc:'RRP 下降 = 市場把多餘資金「投出去」→ 更多錢流入風險資產 | 高企 = 錢停在 Fed',def:true},
-  {no:16,grp:'liquidity',series:'RRP_TL',src:'nyfed',
-   cn:'逆回購餘額 Total Level (RRPONTTLD)',en:'ON RRP Total – NY Fed API',unit:'M$',fav:'down',freq:'daily',
-   desc:'目前卡在 Fed 的資金總量 | 越低代表市場流動性越充裕',def:false},
-  {no:17,grp:'liquidity',series:'RRP_RATE',src:'nyfed',
-   cn:'逆回購中標利率 RRPONTSY AWARD',en:'ON RRP Award Rate – NY Fed API',unit:'%',fav:'down',freq:'daily',
-   desc:'Fed 給逆回購的利率 | 下降 = 停在 Fed 不划算・資金可能流回市場',def:false},
-  // 18-21 US Rates
-  {no:18,grp:'us_rates',series:'FEDFUNDS',src:'fred',
-   cn:'聯邦基金有效利率 (FEDFUNDS)',en:'Fed Funds Rate – FRED monthly',unit:'%',fav:'down',freq:'monthly',
-   desc:'銀行隔夜借貸的實際利率（Fed 真正執行的利率）| 降息 = 融資成本降低',def:true},
-  {no:19,grp:'us_rates',series:'DGS10',src:'fred',
-   cn:'美國10年債殖利率 (US10)',en:'US 10Y Treasury – FRED daily',unit:'%',fav:'down',freq:'daily',
-   desc:'長期資金成本 + 對通脹與經濟的預期 | 下降 = 折現率降低 → 估值空間打開',def:true},
-  {no:20,grp:'us_rates',series:'DGS2',src:'fred',
-   cn:'美國2年期公債殖利率 (DGS2)',en:'US 2Y Treasury – FRED daily',unit:'%',fav:'down',freq:'daily',
-   desc:'市場對未來 1–2 年利率政策走向的預期 | 下降 = 押注降息',def:false},
-  {no:21,grp:'us_rates',series:'DFII10',src:'fred',
-   cn:'10年公債實際殖利率 (GDGS10)',en:'10Y Real Yield TIPS – FRED daily',unit:'%',fav:'down',freq:'daily',
-   desc:'長期資金成本（含通脹）| 下降 = 折現率降低 → 估值空間打開',def:false},
-  // 24-32 Global Rates
-  {no:24,grp:'global',series:'IRSTCI01JPM156N',src:'fred',cn:'日本利率 JPINTR',en:'Japan Rate – FRED OECD',unit:'%',fav:'down',freq:'monthly',desc:'反映日本利率環境 | 日本加息 = Yen Carry Trade 平倉風險',def:false},
-  {no:25,grp:'global',series:'INTDSRCNM193N',src:'fred',cn:'中國利率 CNINTR',en:'China Rate – FRED',unit:'%',fav:'down',freq:'monthly',desc:'中國寬鬆 = 有助全球成長預期・支撐大宗商品需求',def:false},
-  {no:26,grp:'global',series:'IRSTCI01DEM156N',src:'fred',cn:'德國利率 DEINTR',en:'Germany Rate – FRED OECD',unit:'%',fav:'down',freq:'monthly',desc:'反映歐元區（德國代表）利率環境',def:false},
-  {no:27,grp:'global',series:'IRSTCI01INM156N',src:'fred',cn:'印度利率 ININTR',en:'India Rate – FRED OECD',unit:'%',fav:'down',freq:'monthly',desc:'印度寬鬆 = 支持新興市場整體表現',def:false},
-  {no:28,grp:'global',series:'IRSTCI01GBM156N',src:'fred',cn:'英國利率 GBINTR',en:'UK Rate – FRED OECD',unit:'%',fav:'down',freq:'monthly',desc:'英格蘭銀行利率環境',def:false},
-  {no:29,grp:'global',series:'IRSTCI01FRM156N',src:'fred',cn:'法國利率 FRINTR',en:'France Rate – FRED OECD',unit:'%',fav:'down',freq:'monthly',desc:'法國/ECB 利率環境',def:false},
-  {no:30,grp:'global',series:'IRSTCI01ITM156N',src:'fred',cn:'義大利利率 ININTR',en:'Italy Rate – FRED OECD',unit:'%',fav:'down',freq:'monthly',desc:'義大利/ECB 利率環境',def:false},
-  {no:31,grp:'global',series:'IRSTCI01BRM156N',src:'fred',cn:'巴西利率 BRINTR',en:'Brazil SELIC – FRED OECD',unit:'%',fav:'down',freq:'monthly',desc:'新興市場代表性高利率 | 降息有利新興市場資金流入',def:false},
-  {no:32,grp:'global',series:'IRSTCI01CAM156N',src:'fred',cn:'加拿大利率 CAINTR',en:'Canada Rate – FRED OECD',unit:'%',fav:'down',freq:'monthly',desc:'加拿大央行通常比 Fed 早行動，具前瞻意義',def:false},
+// 指標顯示順序（與 Python INDICATORS 清單對應）
+const IND_ORDER=[
+  {sid:'VIXCLS',  no:1,  grp:'sentiment',cn:'恐慌指數（波動率指標）',              def:true},
+  {sid:'GOLD',    no:2,  grp:'commodities',cn:'黃金 (GOLD)',                       def:false},
+  {sid:'SILVER',  no:3,  grp:'commodities',cn:'白銀 (SILVER)',                     def:false},
+  {sid:'WTI',     no:4,  grp:'commodities',cn:'原油 WTI (CL1!)',                   def:false},
+  {sid:'BRENT',   no:5,  grp:'commodities',cn:'原油 Brent (BRENT)',                def:false},
+  {sid:'BTC.D',   no:6,  grp:'crypto',    cn:'比特幣市占率 (BTC.D)',               def:false},
+  {sid:'DXY',     no:7,  grp:'market',    cn:'美元指數 DXY (DTWEXBGS)',            def:false},
+  {sid:'OTHERS.D',no:8,  grp:'crypto',    cn:'山寨幣市占率 (OTHERS.D)',            def:false},
+  {sid:'USDC.D',  no:9,  grp:'crypto',    cn:'穩定幣市占率 USDC',                 def:false},
+  {sid:'USDT.D',  no:10, grp:'crypto',    cn:'穩定幣市占率 USDT',                 def:false},
+  {sid:'USINTR',  no:11, grp:'us_broad',  cn:'美國利率（廣義）USINTR',            def:false},
+  {sid:'WALCL',   no:12, grp:'liquidity', cn:'美聯儲資產負債表 (WALCL)',           def:true},
+  {sid:'M2SL',    no:13, grp:'liquidity', cn:'美國 M2 貨幣供給量 (M2SL)',         def:false},
+  {sid:'TGA',     no:14, grp:'liquidity', cn:'財政部一般賬戶 TGA (WTREGEN)',       def:false},
+  {sid:'RRP_AMT', no:15, grp:'liquidity', cn:'隔夜逆回購每日 (RRPONTSYD)',         def:true},
+  {sid:'RRP_TL',  no:16, grp:'liquidity', cn:'逆回購餘額 Total Level',             def:false},
+  {sid:'RRP_RATE',no:17, grp:'liquidity', cn:'逆回購中標利率 RRPONTSY AWARD',      def:false},
+  {sid:'FEDFUNDS',no:18, grp:'us_rates',  cn:'聯邦基金有效利率 (FEDFUNDS)',        def:true},
+  {sid:'DGS10',   no:19, grp:'us_rates',  cn:'美國10年債殖利率 (US10)',            def:true},
+  {sid:'DGS2',    no:20, grp:'us_rates',  cn:'美國2年期公債殖利率 (DGS2)',         def:false},
+  {sid:'DFII10',  no:21, grp:'us_rates',  cn:'10年公債實際殖利率 (GDGS10)',        def:false},
+  {sid:'JPINTR',  no:24, grp:'global',   cn:'日本利率 JPINTR',                    def:false},
+  {sid:'CNINTR',  no:25, grp:'global',   cn:'中國利率 CNINTR',                    def:false},
+  {sid:'DEINTR',  no:26, grp:'global',   cn:'德國利率 DEINTR',                    def:false},
+  {sid:'ININTR',  no:27, grp:'global',   cn:'印度利率 ININTR',                    def:false},
+  {sid:'GBINTR',  no:28, grp:'global',   cn:'英國利率 GBINTR',                    def:false},
+  {sid:'FRINTR',  no:29, grp:'global',   cn:'法國利率 FRINTR',                    def:false},
+  {sid:'ITINTR',  no:30, grp:'global',   cn:'義大利利率 ININTR',                  def:false},
+  {sid:'BRINTR',  no:31, grp:'global',   cn:'巴西利率 BRINTR',                    def:false},
+  {sid:'CAINTR',  no:32, grp:'global',   cn:'加拿大利率 CAINTR',                  def:false},
 ];
 
-// Resolve actual FRED series ID (some indicators use alias keys)
-function fredSer(ind){return ind.fredSer||ind.series}
+const GRPS={sentiment:'市場情緒',commodities:'商品原物料',crypto:'加密貨幣市占',market:'市場指標',us_broad:'美國廣義利率',liquidity:'Fed 流動性',us_rates:'美國利率',global:'全球央行利率'};
+const SRC_CLS={fred:'sb-fred',yahoo:'sb-yahoo',coingecko:'sb-cg',nyfed:'sb-nyfed',treasury:'sb-tsy'};
+const SRC_LABEL={fred:'FRED',yahoo:'Yahoo Finance',coingecko:'CoinGecko',nyfed:'NY Fed',treasury:'US Treasury'};
 
-// Determine display class for series column
-function serClass(ind,usedSrc){
-  const s=usedSrc||ind.src;
-  return SRC_META[s]?.serCls||'ser-fred';
-}
+const S={data:{},hist:{},checked:new Set(),range:180,chart:null};
 
-// ─── STATE ───
-const S={apiKey:'',tdKey:'',data:{},hist:{},checked:new Set(),range:180,chart:null,busy:false};
-
-// ─── SCORING ───
-const sc_VIX=v=>v<=13?9.5:v<=16?8.5:v<=19?7:v<=22?5.5:v<=26?4:v<=30?2.5:v<=40?1.5:0;
-const sc_TIPS=v=>v<=-1.5?9.5:v<=-0.5?8:v<=0?6.5:v<=0.5?5:v<=1?3.5:v<=1.5?2:0.5;
-const sc_10Y=v=>v<=1.5?9:v<=2?8:v<=2.5?7:v<=3.5?5.5:v<=4.5?3.5:v<=5.5?2:0.5;
-const sc_2Y=v=>v<=1?9:v<=2?7.5:v<=3?6:v<=4?4.5:v<=5?3:1.5;
-const sc_GLB=v=>v<=0.5?8.5:v<=1.5?7:v<=3?5.5:v<=5?4:v<=7?2.5:1;
-const sc_RRP=v=>{const B=v/1000;return B<=50?9.5:B<=150?8:B<=300?6.5:B<=600?5:B<=1000?3:B<=1500?1.5:0.5};
-const sc_RRPRate=v=>v<=0.5?9:v<=1.5?7.5:v<=2.5?6:v<=3.5?4.5:v<=4.5?3:v<=5.5?1.5:0.5;
-const sc_BTCD=v=>v<40?8.5:v<50?7:v<55?5.5:v<60?4:v<65?2.5:1.5;
-const sc_OthD=v=>v>25?8.5:v>20?7:v>15?5.5:v>10?4:2.5;
-const sc_StaD=v=>v<2?9:v<4?7.5:v<6?6:v<8?4.5:v<10?3:1.5;
-
-function sc_Comm(v,h,isMonthly){
-  const lb=isMonthly?12:252;
-  if(!h||h.length<lb)return 5;
-  const p=parseFloat(h[Math.min(h.length-1,lb)].value);
-  if(!p||isNaN(p))return 5;
-  const yoy=(v-p)/Math.abs(p)*100;
-  return yoy<-20?8.5:yoy<-10?7.5:yoy<0?6.5:yoy<10?5:yoy<20?3.5:yoy<35?2:1;
-}
-function sc_DXY(v,h){
-  if(!h||h.length<63)return 5;
-  const p=parseFloat(h[Math.min(h.length-1,63)].value);
-  if(!p||isNaN(p))return 5;
-  const c=(v-p)/p*100;
-  return c<-4?8.5:c<-2?7:c<0?6:c<2?4.5:c<4?3:1.5;
-}
-function sc_WALCL(v,h){
-  if(!h||h.length<26)return 5;
-  const p=parseFloat(h[Math.min(h.length-1,26)].value);
-  if(!p||isNaN(p))return 5;
-  const c=(v-p)/Math.abs(p)*100;
-  return c>=3?9:c>=1?7.5:c>=-0.5?5.5:c>=-2?3.5:c>=-4?2:0.5;
-}
-function sc_M2(v,h){
-  if(!h||h.length<12)return 5;
-  const p=parseFloat(h[12].value);if(!p||isNaN(p))return 5;
-  const c=(v-p)/Math.abs(p)*100;
-  return c>=7?9:c>=4?7.5:c>=1?5.5:c>=-1?4:c>=-3?2.5:1;
-}
-function sc_TGA(v,h){
-  const B=v/1000;
-  const lv=B<=100?8.5:B<=300?7:B<=600?5.5:B<=900?4:2;
-  let tr=5;
-  if(h&&h.length>=12){
-    const pB=parseFloat(h[Math.min(h.length-1,12)].value)/1000;
-    if(!isNaN(pB)){const d=B-pB;tr=d<-200?8.5:d<-50?7:d<0?6:d<100?4.5:d<300?3:1.5}
-  }
-  return(lv+tr)/2;
-}
-function sc_FF(v,h){
-  let b=v<=0.5?9:v<=1.5?7.5:v<=2.5?6:v<=3.5?4.5:v<=4.5?3:v<=5.5?1.5:0.5;
-  if(h&&h.length>3){const p=parseFloat(h[Math.min(h.length-1,3)].value);if(!isNaN(p)){if(v<p-0.1)b=Math.min(10,b+1);else if(v>p+0.1)b=Math.max(0,b-1)}}
-  return b;
-}
-
-function dispatch(series,v,h,ind){
-  switch(series){
-    case 'VIXCLS': return sc_VIX(v);
-    case 'GOLDAMGBD228NLBM': return sc_Comm(v,h,false);
-    case 'PSILVERUSDM': return sc_Comm(v,h,true);
-    case 'DCOILWTICO':case 'DCOILBRENTEU': return sc_Comm(v,h,false);
-    case 'BTC.D': return sc_BTCD(v);
-    case 'DTWEXBGS': return sc_DXY(v,h);
-    case 'OTHERS.D': return sc_OthD(v);
-    case 'USDC.D':case 'USDT.D': return sc_StaD(v);
-    case 'WALCL': return sc_WALCL(v,h);
-    case 'M2SL': return sc_M2(v,h);
-    case 'TGA': return sc_TGA(v,h);
-    case 'RRP_AMT':case 'RRP_TL': return sc_RRP(v);
-    case 'RRP_RATE': return sc_RRPRate(v);
-    case 'USINTR':case 'FEDFUNDS': return sc_FF(v,h);
-    case 'DGS10': return sc_10Y(v);
-    case 'DGS2': return sc_2Y(v);
-    case 'DFII10': return sc_TIPS(v);
-    default: return sc_GLB(v);
-  }
-}
-
-// ─── FORMAT ───
-const BIG_M=['WALCL','TGA','RRP_AMT','RRP_TL'];
-const BIG_B=['M2SL'];
-function fmtVal(ind,raw){
-  const s=ind.series;
-  if(BIG_M.includes(s)){const B=raw/1000;return B>=1000?(B/1000).toFixed(2)+'T':B.toFixed(0)+'B'}
-  if(BIG_B.includes(s))return (raw/1000).toFixed(1)+'T';
-  if(ind.unit==='$')return '$'+raw.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-  if(ind.unit==='%')return raw.toFixed(2)+'%';
-  return raw.toFixed(2);
-}
-function getTrend(valid,freq){
-  const lb=freq==='daily'?20:freq==='monthly'?3:freq==='weekly'?8:2;
-  if(!valid||valid.length<=lb)return 'f';
-  const c=parseFloat(valid[0].value),p=parseFloat(valid[Math.min(valid.length-1,lb)].value);
-  if(isNaN(p)||p===0)return 'f';
-  const r=(c-p)/Math.abs(p);return r>0.005?'u':r<-0.005?'d':'f';
-}
-function buildHistScores(ind,valid){
-  const pts=[];
-  for(let i=0;i<valid.length;i++){
-    const sub=valid.slice(i);
-    const v=parseFloat(sub[0].value);
-    if(isNaN(v))continue;
-    const sc=dispatch(ind.series,v,sub,ind);
-    if(sc!=null)pts.push({x:new Date(sub[0].date),y:+sc.toFixed(1)});
-  }
-  return pts.reverse();
-}
-
-// ─── CoinGecko ───
-async function fetchCoinGecko(){
-  const r=await fetch('https://api.coingecko.com/api/v3/global');
-  const j=await r.json();
-  const p=j.data.market_cap_percentage||{};
-  const btcd=p.btc||0,ethd=p.eth||0,usdtd=p.usdt||0,bnd=p.bnb||0,usdcd=p.usdc||0,xrpd=p.xrp||0;
-  const othersd=Math.max(0,100-btcd-ethd-usdtd-bnd-usdcd-xrpd);
-  const map={'BTC.D':btcd,'USDC.D':usdcd,'USDT.D':usdtd,'OTHERS.D':othersd};
-  for(const[ser,val]of Object.entries(map)){
-    const ind=INDS.find(i=>i.series===ser);if(!ind)continue;
-    S.data[ser]={raw:val,score:dispatch(ser,val,null,ind),str:val.toFixed(1)+'%',date:'live',trend:'f',usedSrc:'cg'};
-    S.hist[ser]=[];
-  }
-}
-
-// ─── NY Fed API (RRPONTSYD – 比 FRED 快1天) ───
-async function fetchNYFed(){
-  // Try both known NY Fed OMO endpoints
-  const urls=[
-    'https://markets.newyorkfed.org/api/rp/reverserepo/propositions/results/latest.json',
-    'https://markets.newyorkfed.org/api/rp/all/results/lastTwoWeeks.json',
-  ];
-  let j=null;
-  for(const u of urls){
-    try{
-      const r=await fetch(u,{headers:{Accept:'application/json'}});
-      if(r.ok){j=await r.json();break}
-    }catch(e){continue}
-  }
-  if(!j)throw new Error('All NY Fed endpoints failed');
-  
-  // Parse flexibly – NY Fed may use 'rp', 'repo', or root 'operations'
-  const ops=j?.rp?.operations||j?.repo?.operations||j?.operations||[];
-  if(!ops.length)throw new Error('No operations in NY Fed response');
-  
-  // Prefer most recent, look for reverse repo ops (Fed selling securities = draining cash)
-  // NY Fed labels these differently; accept any entry that has a totalAmt field
-  const latest=ops.find(o=>{
-    const det=o?.details||o?.propositions?.details||{};
-    return (det.totalAmtAccepted||det.totalAmtSubmitted||0)>0;
-  })||ops[0];
-  
-  const det=latest?.details||latest?.propositions?.details||{};
-  const totalAmt=((det.totalAmtAccepted||det.totalAmtSubmitted||0)/1e6); // dollars → millions
-  const rate=det.weightedAvgRate||det.weightedAverageRate||0;
-  const date=latest.operationDate||latest.date||new Date().toISOString().split('T')[0];
-
-  // Store RRP amount (rows 15+16) and rate (row 17)
-  const amt_ind=INDS.find(i=>i.series==='RRP_AMT');
-  const tl_ind=INDS.find(i=>i.series==='RRP_TL');
-  const rate_ind=INDS.find(i=>i.series==='RRP_RATE');
-
-  if(amt_ind){
-    S.data['RRP_AMT']={raw:totalAmt,score:sc_RRP(totalAmt),str:fmtVal(amt_ind,totalAmt),date,trend:'f',usedSrc:'nyfed'};
-    S.hist['RRP_AMT']=[];
-  }
-  if(tl_ind){
-    S.data['RRP_TL']={raw:totalAmt,score:sc_RRP(totalAmt),str:fmtVal(tl_ind,totalAmt),date,trend:'f',usedSrc:'nyfed'};
-    S.hist['RRP_TL']=[];
-  }
-  if(rate_ind){
-    S.data['RRP_RATE']={raw:rate,score:sc_RRPRate(rate),str:rate.toFixed(2)+'%',date,trend:'f',usedSrc:'nyfed'};
-    S.hist['RRP_RATE']=[];
-  }
-
-  // Also fetch RRPONTSYD history from FRED for chart (NY Fed doesn't easily give 2Y history)
+// ── 從 data.json 載入 ──
+async function loadData(){
+  document.getElementById('ld-msg').textContent='正在載入 data.json …';
   try{
-    const fredUrl=`https://api.stlouisfed.org/fred/series/observations?series_id=RRPONTSYD&api_key=${S.apiKey}&file_type=json&limit=780&sort_order=desc`;
-    const fr=await fetch(fredUrl);const fj=await fr.json();
-    const valid=(fj.observations||[]).filter(o=>o.value&&o.value!=='.'&&!isNaN(parseFloat(o.value)));
-    if(valid.length&&amt_ind){
-      S.hist['RRP_AMT']=buildHistScores(amt_ind,valid);
-      S.hist['RRP_TL']=buildHistScores(tl_ind||amt_ind,valid);
+    const r = await fetch('data.json?t='+Date.now());
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const j = await r.json();
+    document.getElementById('loading').style.display='none';
+    document.getElementById('dashboard').style.display='flex';
+    populate(j);
+  }catch(e){
+    document.getElementById('loading').style.display='none';
+    if(e.message.includes('404')||e.message.includes('HTTP')){
+      document.getElementById('no-data').style.display='flex';
+    } else {
+      document.getElementById('no-data').style.display='flex';
+      document.querySelector('.nd-card h2').textContent='載入失敗：'+e.message;
     }
-    if(valid.length&&rate_ind){
-      const rateHist=valid.map(o=>({date:o.date,value:o.value}));
-      S.hist['RRP_RATE']=buildHistScores(rate_ind,rateHist);
-    }
-  }catch(e){console.warn('RRP chart history from FRED failed:',e.message)}
+  }
 }
 
-// ─── US Treasury FiscalData (TGA – 比 FRED 快1天) ───
-async function fetchTreasury(){
-  // Use URLSearchParams for proper encoding of page[size] bracket syntax
-  const params=new URLSearchParams({
-    'fields':'record_date,account_type,open_today_bal',
-    'filter':'account_type:eq:Federal Reserve Account',
-    'sort':'-record_date',
-    'page[size]':'730',
-    'page[number]':'1'
+function populate(j){
+  // Store data
+  S.data = j.indicators||{};
+  // Build hist lookup
+  for(const[sid,d] of Object.entries(S.data)){
+    S.hist[sid] = (d.hist||[]).map(([ts,sc])=>({x:new Date(ts),y:sc}));
+  }
+  // Overall score
+  const avg = j.overall_score;
+  if(avg!=null){
+    const col = avg>=7?'var(--green)':avg<4?'var(--red)':'var(--gold)';
+    const glow = avg>=7?'0 0 18px #2eba6244':avg<4?'0 0 18px #f0484844':'0 0 18px #d4a01744';
+    const lbl = avg>=7?'市場環境偏多・風險資產獲支撐':avg<4?'市場環境偏空・注意下行風險':'市場環境中性・謹慎觀望';
+    document.getElementById('sb-num').textContent=avg.toFixed(1);
+    document.getElementById('sb-num').style.color=col;
+    document.getElementById('sb-circle').style.borderColor=col;
+    document.getElementById('sb-circle').style.boxShadow=glow;
+    document.getElementById('sb-signal').textContent=lbl;
+    document.getElementById('sg-fill').style.width=(avg/10*100)+'%';
+  }
+  // Updated time
+  if(j.last_updated){
+    const dt = new Date(j.last_updated);
+    document.getElementById('hd-updated').textContent='數據更新: '+dt.toLocaleString('zh-TW',{timeZone:'Asia/Taipei'});
+  }
+  // Source pills
+  const srcs = new Set(Object.values(S.data).map(d=>d.src).filter(Boolean));
+  ['fred','yahoo','coingecko','nyfed','treasury'].forEach(s=>{
+    const el=document.getElementById('sp-'+s.replace('coingecko','cg').replace('nyfed','nyfed').replace('treasury','tsy').replace('yahoo','yahoo').replace('fred','fred'));
+    if(el) el.classList.toggle('ok', srcs.has(s));
   });
-  const url='https://api.fiscaldata.treasury.gov/services/api/v1/accounting/od/dts_table_1?'+params;
-  const r=await fetch(url,{headers:{Accept:'application/json'}});
-  if(!r.ok)throw new Error('HTTP '+r.status);
-  const j=await r.json();
-  const rows=(j.data||[]).filter(d=>d.open_today_bal&&!isNaN(parseFloat(d.open_today_bal)));
-  if(!rows.length)throw new Error('No TGA data');
-  // Convert to FRED-like format (open_today_bal is already in millions)
-  const valid=rows.map(d=>({date:d.record_date,value:d.open_today_bal}));
-  const ind=INDS.find(i=>i.series==='TGA');
-  if(!ind)return;
-  const raw=parseFloat(valid[0].value);
-  const score=sc_TGA(raw,valid);
-  S.data['TGA']={raw,score,str:fmtVal(ind,raw),date:valid[0].date,trend:getTrend(valid,'daily'),usedSrc:'treasury'};
-  S.hist['TGA']=buildHistScores(ind,valid);
+  buildTable();buildCheckboxes();initChart();updateChart();
 }
 
-// ─── Twelve Data (real-time market prices, optional) ───
-async function fetchTwelveData(ind){
-  if(!S.tdKey||!ind.tdSym)throw new Error('No TD key or symbol');
-  const url=`https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(ind.tdSym)}&interval=1day&outputsize=730&apikey=${S.tdKey}`;
-  const r=await fetch(url);
-  if(!r.ok)throw new Error('HTTP '+r.status);
-  const j=await r.json();
-  if(j.status==='error')throw new Error(j.message||'TD API error');
-  const values=j.values||[];
-  if(!values.length)throw new Error('No values');
-  const valid=values.map(v=>({date:v.datetime,value:v.close})).filter(v=>v.value&&!isNaN(parseFloat(v.value)));
-  if(!valid.length)throw new Error('No valid data');
-  const raw=parseFloat(valid[0].value);
-  const score=dispatch(ind.series,raw,valid,ind);
-  S.data[ind.series]={raw,score,str:fmtVal(ind,raw),date:valid[0].date,trend:getTrend(valid,'daily'),usedSrc:'td'};
-  S.hist[ind.series]=buildHistScores(ind,valid);
-}
-
-// ─── FRED ───
-async function fetchFred(ind){
-  const ser=fredSer(ind);
-  const lims={daily:780,weekly:156,monthly:48,quarterly:16};
-  const lim=lims[ind.freq]||100;
-  const url=`https://api.stlouisfed.org/fred/series/observations?series_id=${ser}&api_key=${S.apiKey}&file_type=json&limit=${lim}&sort_order=desc`;
-  const r=await fetch(url);
-  // HTTP 400/403 from FRED = invalid or missing API key
-  if(!r.ok){
-    if(r.status===400||r.status===403)throw new Error('INVALID_KEY');
-    throw new Error('HTTP '+r.status);
-  }
-  const j=await r.json();
-  if(j.error_message){
-    if(j.error_code===400||/api_key|not registered|invalid/i.test(j.error_message))throw new Error('INVALID_KEY');
-    throw new Error(j.error_message);
-  }
-  const valid=(j.observations||[]).filter(o=>o.value&&o.value!=='.'&&!isNaN(parseFloat(o.value)));
-  if(!valid.length)throw new Error('No data');
-  const raw=parseFloat(valid[0].value);
-  const score=dispatch(ind.series,raw,valid,ind);
-  S.data[ind.series]={raw,score,str:fmtVal(ind,raw),date:valid[0].date,trend:getTrend(valid,ind.freq),usedSrc:'fred'};
-  S.hist[ind.series]=buildHistScores(ind,valid);
-}
-
-// ─── REFRESH ALL ───
-const delay=ms=>new Promise(r=>setTimeout(r,ms));
-function setStatus(t,spin){document.getElementById('hd-status').innerHTML=spin?`<span class="spin"></span> ${t}`:t}
-function setPill(id,state){const el=document.getElementById('spill-'+id);if(el){el.classList.remove('ok','er','na');el.classList.add(state)}}
-
-async function refreshAll(){
-  if(S.busy)return;S.busy=true;
-  document.getElementById('refresh-btn').disabled=true;
-  document.getElementById('key-err').style.display='none';
-
-  // Phase 1: CoinGecko
-  setStatus('🪙 CoinGecko …',true);
-  try{await fetchCoinGecko();setPill('cg','ok')}
-  catch(e){console.warn('CG:',e.message);setPill('cg','er');['BTC.D','OTHERS.D','USDC.D','USDT.D'].forEach(s=>{S.data[s]={error:true};S.hist[s]=[]})}
-  INDS.filter(i=>i.src==='cg').forEach(i=>{updateRow(i);updateCbScore(i)});
-
-  // Phase 2: NY Fed (RRP)
-  setStatus('🏛️ NY Fed RRP …',true);
-  try{await fetchNYFed();setPill('nyfed','ok')}
-  catch(e){
-    console.warn('NY Fed RRP failed, falling back to FRED:',e.message);
-    setPill('nyfed','er');
-    // Fallback: use FRED for RRP
-    try{
-      const fredUrl=`https://api.stlouisfed.org/fred/series/observations?series_id=RRPONTSYD&api_key=${S.apiKey}&file_type=json&limit=780&sort_order=desc`;
-      const fr=await fetch(fredUrl);const fj=await fr.json();
-      const valid=(fj.observations||[]).filter(o=>o.value&&o.value!=='.'&&!isNaN(parseFloat(o.value)));
-      if(valid.length){
-        const raw=parseFloat(valid[0].value);
-        const amt_ind=INDS.find(i=>i.series==='RRP_AMT');
-        const tl_ind=INDS.find(i=>i.series==='RRP_TL');
-        const rate_ind=INDS.find(i=>i.series==='RRP_RATE');
-        if(amt_ind){S.data['RRP_AMT']={raw,score:sc_RRP(raw),str:fmtVal(amt_ind,raw),date:valid[0].date,trend:getTrend(valid,'daily'),usedSrc:'fred'};S.hist['RRP_AMT']=buildHistScores(amt_ind,valid)}
-        if(tl_ind){S.data['RRP_TL']={raw,score:sc_RRP(raw),str:fmtVal(tl_ind,raw),date:valid[0].date,trend:getTrend(valid,'daily'),usedSrc:'fred'};S.hist['RRP_TL']=buildHistScores(tl_ind,valid)}
-        if(rate_ind){const iorbUrl=`https://api.stlouisfed.org/fred/series/observations?series_id=IORB&api_key=${S.apiKey}&file_type=json&limit=100&sort_order=desc`;try{const ir=await fetch(iorbUrl);const ij=await ir.json();const iv=(ij.observations||[]).filter(o=>o.value&&o.value!=='.');if(iv.length){const rv=parseFloat(iv[0].value);S.data['RRP_RATE']={raw:rv,score:sc_RRPRate(rv),str:rv.toFixed(2)+'%',date:iv[0].date,trend:'f',usedSrc:'fred'};S.hist['RRP_RATE']=[]}}catch(ie){S.data['RRP_RATE']={error:true};S.hist['RRP_RATE']=[]}}
-      }
-    }catch(fe){['RRP_AMT','RRP_TL','RRP_RATE'].forEach(s=>{S.data[s]={error:true};S.hist[s]=[]})}
-  }
-  INDS.filter(i=>['RRP_AMT','RRP_TL','RRP_RATE'].includes(i.series)).forEach(i=>{updateRow(i);updateCbScore(i)});
-  await delay(50);
-
-  // Phase 3: Treasury FiscalData (TGA)
-  setStatus('🏛️ US Treasury TGA …',true);
-  try{await fetchTreasury();setPill('tsy','ok')}
-  catch(e){
-    console.warn('Treasury TGA failed, falling back to FRED:',e.message);
-    setPill('tsy','er');
-    try{
-      const tgaUrl=`https://api.stlouisfed.org/fred/series/observations?series_id=WTREGEN&api_key=${S.apiKey}&file_type=json&limit=156&sort_order=desc`;
-      const tr=await fetch(tgaUrl);const tj=await tr.json();
-      const valid=(tj.observations||[]).filter(o=>o.value&&o.value!=='.'&&!isNaN(parseFloat(o.value)));
-      const tga_ind=INDS.find(i=>i.series==='TGA');
-      if(valid.length&&tga_ind){const raw=parseFloat(valid[0].value);S.data['TGA']={raw,score:sc_TGA(raw,valid),str:fmtVal(tga_ind,raw),date:valid[0].date,trend:getTrend(valid,'weekly'),usedSrc:'fred'};S.hist['TGA']=buildHistScores(tga_ind,valid)}
-    }catch(fe){S.data['TGA']={error:true};S.hist['TGA']=[]}
-  }
-  const tga_ind=INDS.find(i=>i.series==='TGA');
-  if(tga_ind){updateRow(tga_ind);updateCbScore(tga_ind)}
-  await delay(50);
-
-  // Phase 4: Twelve Data (if key provided) + FRED fallback
-  const tdInds=INDS.filter(i=>i.tdSym);
-  let tdOk=0;
-  for(const ind of tdInds){
-    if(S.tdKey){
-      setStatus(`📈 Twelve Data: ${ind.tdSym}`,true);
-      try{await fetchTwelveData(ind);tdOk++;await delay(200);continue}
-      catch(e){console.warn('TD failed for',ind.series,e.message)}
-    }
-    // FRED fallback for market indicators
-    setStatus(`🏦 FRED: ${fredSer(ind)}`,true);
-    try{await fetchFred(ind)}
-    catch(e){
-      if(e.message==='INVALID_KEY'){
-        // Mark ALL unfetched indicators as error, then show banner
-        INDS.filter(i=>i.src==='fred'&&!S.data[i.series]).forEach(i=>{S.data[i.series]={error:true};S.hist[i.series]=[]});
-        INDS.filter(i=>i.src==='fred'&&!S.data[i.series]?.score).forEach(i=>{updateRow(i);updateCbScore(i)});
-        document.getElementById('key-err').style.display='flex';
-        setPill('fred','er');setStatus('⚠️ FRED Key 無效，請點「管理 Key」更換',false);
-        updateOverall();updateChart();
-        document.getElementById('hd-updated').textContent='更新: '+new Date().toLocaleTimeString('zh-TW');
-        document.getElementById('refresh-btn').disabled=false;S.busy=false;return;
-      }
-      S.data[ind.series]={error:true};S.hist[ind.series]=[];
-    }
-    updateRow(ind);updateCbScore(ind);
-    await delay(85);
-  }
-  if(S.tdKey)setPill('td',tdOk===tdInds.length?'ok':'er');
-  else setPill('td','na');
-
-  // Phase 5: Pure FRED indicators
-  const fredInds=INDS.filter(i=>i.src==='fred'&&!i.tdSym);
-  let fredOk=0,keyBad=false;
-  for(const ind of fredInds){
-    if(keyBad)break;
-    setStatus(`🏦 FRED: ${fredSer(ind)}`,true);
-    try{await fetchFred(ind);fredOk++}
-    catch(e){
-      if(e.message==='INVALID_KEY'){
-        keyBad=true;
-        // Mark remaining unfetched as error so table shows N/A not spinner
-        fredInds.forEach(i=>{if(!S.data[i.series]){S.data[i.series]={error:true};S.hist[i.series]=[];updateRow(i);updateCbScore(i)}});
-        document.getElementById('key-err').style.display='flex';
-        setPill('fred','er');break;
-      }
-      console.warn('FRED',fredSer(ind),e.message);S.data[ind.series]={error:true};S.hist[ind.series]=[];
-    }
-    updateRow(ind);updateCbScore(ind);
-    await delay(85);
-  }
-  if(!keyBad)setPill('fred',fredOk>0?'ok':'er');
-
-  updateOverall();updateChart();
-  document.getElementById('hd-updated').textContent='更新: '+new Date().toLocaleTimeString('zh-TW');
-  setStatus(keyBad?'⚠️ FRED Key 無效':'已更新 ✓',false);
-  document.getElementById('refresh-btn').disabled=false;S.busy=false;
-}
-
-// ─── TABLE ───
+// ── Table ──
 function buildTable(){
   const tbody=document.getElementById('tbl-body');tbody.innerHTML='';
   let lastGrp=null;
-  INDS.forEach(ind=>{
-    if(ind.grp!==lastGrp){
-      lastGrp=ind.grp;
-      const grpSrcKey=GRPS_SRC[ind.grp]||'fred';
-      const grpLabel=grpSrcKey==='mixed'?'FRED + NY Fed + Treasury':grpSrcKey==='auto'?(S.tdKey?'Twelve Data / FRED':'FRED'):SRC_META[grpSrcKey]?.label||'FRED';
-      const grpCls=grpSrcKey==='mixed'?'sb-nyfed':grpSrcKey==='auto'?(S.tdKey?'sb-td':'sb-fred'):SRC_META[grpSrcKey]?.cls||'sb-fred';
+  IND_ORDER.forEach((meta,i)=>{
+    const d=S.data[meta.sid];
+    if(meta.grp!==lastGrp){
+      lastGrp=meta.grp;
+      const srcKey=d?.src||'fred';
+      const srcCls=SRC_CLS[srcKey]||'';
+      const srcLbl=SRC_LABEL[srcKey]||srcKey;
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td colspan="8" style="padding:0"><div class="grp-hdr">${GRPS[ind.grp]}<span class="src-badge ${grpCls}">${grpLabel}</span></div></td>`;
+      tr.innerHTML=`<td colspan="8" style="padding:0"><div class="grp-hdr">${GRPS[meta.grp]||meta.grp}<span class="src-badge ${srcCls}">${srcLbl}</span></div></td>`;
       tbody.appendChild(tr);
     }
-    // Display label for series column
-    const dispLabel=ind.tdSym&&S.tdKey?ind.tdSym:(ind.fredSer||ind.series);
-    const scls=serClass(ind,ind.src==='cg'?'cg':ind.tdSym&&S.tdKey?'td':ind.src);
     const tr=document.createElement('tr');
-    tr.id='r-'+ind.series;
-    tr.innerHTML=`<td class="c-no">${ind.no}</td>
-      <td class="c-ser ${scls}" id="ser-${ind.series}">${dispLabel}</td>
-      <td class="c-name">${ind.cn}<small>${ind.en}</small></td>
-      <td class="c-val"><span class="loading-ph">…</span></td>
-      <td class="c-date hide-sm"><span class="loading-ph">…</span></td>
-      <td><span class="trend-f">–</span></td>
-      <td><span class="loading-ph">…</span></td>
-      <td class="hide-sm"><span class="loading-ph">…</span></td>`;
-    tr.addEventListener('mouseenter',e=>showTT(e,ind));
-    tr.addEventListener('mousemove',e=>moveTT(e));
-    tr.addEventListener('mouseleave',hideTT);
+    tr.id='r-'+meta.sid;
+    const srcCls=SRC_CLS[d?.src||'fred']||'';
+    const dispId=meta.sid;
+    tr.innerHTML=`<td class="c-no">${meta.no}</td>
+      <td class="c-ser ${srcCls}">${dispId}</td>
+      <td class="c-name">${meta.cn}<small>${d?.desc||''}</small></td>
+      <td class="c-val"></td><td class="c-date hide-sm"></td>
+      <td></td><td></td><td class="hide-sm"></td>`;
+    tr.addEventListener('mouseenter',e=>{
+      const t=document.getElementById('tooltip');
+      document.getElementById('tt-h').textContent=meta.cn;
+      document.getElementById('tt-p').textContent=d?.desc||'';
+      document.getElementById('tt-src').textContent='來源: '+(SRC_LABEL[d?.src]||d?.src||'—');
+      t.style.display='block';setTimeout(()=>t.style.opacity='1',10);
+      let x=e.clientX+14,y=e.clientY+14;
+      if(x+295>window.innerWidth)x=e.clientX-305;if(y+130>window.innerHeight)y=e.clientY-140;
+      t.style.left=x+'px';t.style.top=y+'px';
+    });
+    tr.addEventListener('mouseleave',()=>{const t=document.getElementById('tooltip');t.style.opacity='0';setTimeout(()=>t.style.display='none',150)});
     tbody.appendChild(tr);
+    fillRow(meta,d);
   });
 }
 
-function updateRow(ind){
-  const tr=document.getElementById('r-'+ind.series);if(!tr)return;
+function fillRow(meta,d){
+  const tr=document.getElementById('r-'+meta.sid);if(!tr)return;
   const td=tr.querySelectorAll('td');
-  const d=S.data[ind.series];
-  // Update series label to show actual source used
-  const serEl=document.getElementById('ser-'+ind.series);
-  if(serEl&&d&&d.usedSrc){
-    const dispLabel=d.usedSrc==='td'&&ind.tdSym?ind.tdSym:(ind.fredSer||ind.series);
-    serEl.textContent=dispLabel;
-    serEl.className='c-ser '+serClass(ind,d.usedSrc);
-  }
-  if(!d||d.error){
+  if(!d||d.error||d.v==null){
     td[3].innerHTML='<span class="err-ph">N/A</span>';td[4].innerHTML='—';
     td[5].innerHTML='<span class="trend-f">–</span>';td[6].innerHTML='—';td[7].innerHTML='—';
     return;
   }
   const t=d.trend,ts=t==='u'?'↑':t==='d'?'↓':'→',tc=t==='u'?'trend-u':t==='d'?'trend-d':'trend-f';
-  const bull=(ind.fav==='up'&&t==='u')||(ind.fav==='down'&&t==='d');
-  const bear=(ind.fav==='up'&&t==='d')||(ind.fav==='down'&&t==='u');
+  const bull=(d.fav==='up'&&t==='u')||(d.fav==='down'&&t==='d');
+  const bear=(d.fav==='up'&&t==='d')||(d.fav==='down'&&t==='u');
   const sc=d.score;
   const bc=sc==null?'b-mi':sc>=7?'b-hi':sc>=4?'b-mi':'b-lo';
   const sg=sc==null?{t:'—',c:''}:sc>=7?{t:'看漲 ↑',c:'sg-bull'}:sc>=4?{t:'中性 →',c:'sg-neu'}:{t:'看跌 ↓',c:'sg-bear'};
   td[3].innerHTML=`<span class="${bull?'val-bull':bear?'val-bear':''}">${d.str||'—'}</span>`;
-  td[4].innerHTML=`<span class="c-date">${d.date||'—'}</span>`;
+  td[4].innerHTML=`<span class="c-date">${(d.date||'').slice(0,10)}</span>`;
   td[5].innerHTML=`<span class="${tc}">${ts}</span>`;
   td[6].innerHTML=sc!=null?`<span class="badge ${bc}">${sc.toFixed(1)}</span>`:'—';
   td[7].innerHTML=`<span class="sig ${sg.c}">${sg.t}</span>`;
 }
 
-// ─── OVERALL ───
-function updateOverall(){
-  const seen=new Set(),scores=[];
-  INDS.forEach(ind=>{if(seen.has(ind.series))return;seen.add(ind.series);const s=S.data[ind.series]?.score;if(s!=null)scores.push(s)});
-  if(!scores.length)return;
-  const avg=scores.reduce((a,b)=>a+b,0)/scores.length;
-  const col=avg>=7?'var(--green)':avg<4?'var(--red)':'var(--gold)';
-  const glow=avg>=7?'0 0 18px #2eba6244':avg<4?'0 0 18px #f0484844':'0 0 18px #d4a01744';
-  const lbl=avg>=7?'市場環境偏多・風險資產獲支撐':avg<4?'市場環境偏空・注意下行風險':'市場環境中性・謹慎觀望';
-  document.getElementById('sb-num').textContent=avg.toFixed(1);
-  document.getElementById('sb-num').style.color=col;
-  document.getElementById('sb-circle').style.borderColor=col;
-  document.getElementById('sb-circle').style.boxShadow=glow;
-  document.getElementById('sb-signal').textContent=lbl;
-  document.getElementById('sg-fill').style.width=(avg/10*100)+'%';
-}
-
-// ─── CHART ───
+// ── Chart ──
 function initChart(){
   const ctx=document.getElementById('myChart').getContext('2d');
   S.chart=new Chart(ctx,{type:'line',data:{datasets:[]},options:{
@@ -858,100 +375,62 @@ function updateChart(){
   const cutoff=new Date();cutoff.setDate(cutoff.getDate()-S.range);
   const datasets=[{label:'中性線',data:[{x:cutoff,y:5},{x:new Date(),y:5}],borderColor:'#1e2d47',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false,tension:0,order:99}];
   let ci=0;
-  INDS.forEach(ind=>{
-    if(!S.checked.has(ind.series))return;
-    const hist=S.hist[ind.series];if(!hist||!hist.length)return;
+  IND_ORDER.forEach(meta=>{
+    if(!S.checked.has(meta.sid))return;
+    const hist=S.hist[meta.sid];if(!hist||!hist.length)return;
     const data=hist.filter(p=>p.x>=cutoff);if(!data.length)return;
     const col=COLORS[ci%COLORS.length];ci++;
-    datasets.push({label:ind.cn,data,borderColor:col,backgroundColor:col+'18',borderWidth:1.8,pointRadius:0,pointHoverRadius:4,tension:0.3,fill:false});
+    datasets.push({label:meta.cn,data,borderColor:col,backgroundColor:col+'18',borderWidth:1.8,pointRadius:0,pointHoverRadius:4,tension:0.3,fill:false});
   });
   S.chart.data.datasets=datasets;S.chart.update();
 }
 function setRange(d,btn){S.range=d;document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');updateChart()}
 
-// ─── CHECKBOXES ───
+// ── Checkboxes ──
 function buildCheckboxes(){
   const panel=document.getElementById('cb-panel');panel.innerHTML='';
   let lastGrp=null;
-  INDS.forEach((ind,i)=>{
+  IND_ORDER.forEach((meta,i)=>{
     const col=COLORS[i%COLORS.length];
-    if(ind.grp!==lastGrp){lastGrp=ind.grp;const lbl=document.createElement('div');lbl.className='cb-grp';lbl.textContent=GRPS[ind.grp];panel.appendChild(lbl)}
-    if(ind.def)S.checked.add(ind.series);
+    if(meta.grp!==lastGrp){lastGrp=meta.grp;const lbl=document.createElement('div');lbl.className='cb-grp';lbl.textContent=GRPS[meta.grp]||meta.grp;panel.appendChild(lbl)}
+    if(meta.def)S.checked.add(meta.sid);
     const item=document.createElement('div');item.className='cb-item';
-    item.innerHTML=`<input type="checkbox" id="cb-${ind.series}" ${ind.def?'checked':''}
-      onchange="toggleSeries('${ind.series}')">
+    const sc=S.data[meta.sid]?.score;
+    const scStr=sc!=null?sc.toFixed(1):'—';
+    const scColor=sc!=null?(sc>=7?'var(--green)':sc>=4?'var(--gold)':'var(--red)'):'var(--muted)';
+    item.innerHTML=`<input type="checkbox" id="cb-${meta.sid}" ${meta.def?'checked':''}
+      onchange="toggleSeries('${meta.sid}')">
       <div class="cb-dot" style="background:${col}"></div>
-      <label class="cb-lbl" for="cb-${ind.series}">${ind.cn}</label>
-      <span class="cb-sc" id="cbs-${ind.series}" style="color:var(--muted)">—</span>`;
+      <label class="cb-lbl" for="cb-${meta.sid}">${meta.cn}</label>
+      <span class="cb-sc" style="color:${scColor}">${scStr}</span>`;
     panel.appendChild(item);
   });
 }
 function toggleSeries(s){S.checked.has(s)?S.checked.delete(s):S.checked.add(s);updateChart()}
-function updateCbScore(ind){
-  const el=document.getElementById('cbs-'+ind.series);if(!el)return;
-  const d=S.data[ind.series];
-  if(!d||d.error||d.score==null){el.textContent='—';el.style.color='var(--muted)';return}
-  el.textContent=d.score.toFixed(1);
-  el.style.color=d.score>=7?'var(--green)':d.score>=4?'var(--gold)':'var(--red)';
+
+// ── Reload ──
+async function reloadData(){
+  const btn=document.getElementById('refresh-btn');
+  btn.disabled=true;
+  document.getElementById('hd-status').innerHTML='<span class="spin"></span> 重新載入…';
+  try{
+    const r=await fetch('data.json?t='+Date.now());
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const j=await r.json();
+    // Reset state
+    S.data={};S.hist={};S.checked=new Set();S.chart?.destroy();
+    document.getElementById('tbl-body').innerHTML='';
+    document.getElementById('cb-panel').innerHTML='<div class="cb-grp">選擇指標比較</div>';
+    populate(j);
+    document.getElementById('hd-status').textContent='已刷新 ✓';
+  }catch(e){
+    document.getElementById('hd-status').textContent='刷新失敗：'+e.message;
+  }
+  btn.disabled=false;
 }
 
-// ─── TOOLTIP ───
-function showTT(e,ind){
-  const t=document.getElementById('tooltip');
-  document.getElementById('tt-h').textContent=ind.cn;
-  document.getElementById('tt-p').textContent=ind.desc;
-  const d=S.data[ind.series];
-  const srcLabel=d?.usedSrc?SRC_META[d.usedSrc]?.label||d.usedSrc:'—';
-  document.getElementById('tt-src').textContent='數據來源: '+srcLabel;
-  t.style.display='block';setTimeout(()=>t.style.opacity='1',10);moveTT(e);
-}
-function moveTT(e){
-  const t=document.getElementById('tooltip');
-  let x=e.clientX+14,y=e.clientY+14;
-  if(x+295>window.innerWidth)x=e.clientX-305;if(y+140>window.innerHeight)y=e.clientY-150;
-  t.style.left=x+'px';t.style.top=y+'px';
-}
-function hideTT(){const t=document.getElementById('tooltip');t.style.opacity='0';setTimeout(()=>t.style.display='none',150)}
-
-// ─── KEY MODAL ───
-function openKeyModal(){
-  document.getElementById('m-fred').value='';
-  document.getElementById('m-td').value=S.tdKey||'';
-  document.getElementById('key-modal').style.display='flex';
-  setTimeout(()=>document.getElementById('m-fred').focus(),100);
-}
-function closeKeyModal(){document.getElementById('key-modal').style.display='none'}
-function applyKeys(){
-  const fred=document.getElementById('m-fred').value.trim();
-  const td=document.getElementById('m-td').value.trim();
-  if(!fred){alert('請輸入 FRED API Key');return}
-  S.apiKey=fred;localStorage.setItem('macroDashKey',fred);
-  S.tdKey=td;localStorage.setItem('macroDashTdKey',td);
-  closeKeyModal();
-  document.getElementById('key-err').style.display='none';
-  refreshAll();
-}
-
-// ─── INIT ───
-function initDashboard(savedFred,savedTd){
-  const fred=savedFred||document.getElementById('setup-fred')?.value.trim()||'';
-  const td=savedTd||document.getElementById('setup-td')?.value.trim()||'';
-  if(!fred){alert('請輸入 FRED API Key');return}
-  S.apiKey=fred;localStorage.setItem('macroDashKey',fred);
-  S.tdKey=td;if(td)localStorage.setItem('macroDashTdKey',td);
-  document.getElementById('setup-screen').style.display='none';
-  document.getElementById('dashboard').style.display='flex';
-  setPill('td',td?'na':'na');
-  buildTable();buildCheckboxes();initChart();refreshAll();
-}
-
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('setup-fred')?.addEventListener('keydown',e=>{if(e.key==='Enter')initDashboard()});
-  document.getElementById('m-fred')?.addEventListener('keydown',e=>{if(e.key==='Enter')applyKeys()});
-  const savedFred=localStorage.getItem('macroDashKey');
-  const savedTd=localStorage.getItem('macroDashTdKey')||'';
-  if(savedFred)initDashboard(savedFred,savedTd);
-});
+// ── Init ──
+window.addEventListener('DOMContentLoaded', loadData);
 </script>
 </body>
 </html>
