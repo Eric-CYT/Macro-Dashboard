@@ -510,16 +510,33 @@ async function fetchCoinGecko(){
 
 // ─── NY Fed API (RRPONTSYD – 比 FRED 快1天) ───
 async function fetchNYFed(){
-  // Latest RRP operation
-  const latestUrl='https://markets.newyorkfed.org/api/rp/reverserepo/propositions/results/latest.json';
-  const r=await fetch(latestUrl,{headers:{Accept:'application/json'}});
-  if(!r.ok)throw new Error('HTTP '+r.status);
-  const j=await r.json();
-  const ops=j?.repo?.operations||j?.rp?.operations||j?.operations||[];
-  if(!ops.length)throw new Error('No operations');
-  const latest=ops[0];
+  // Try both known NY Fed OMO endpoints
+  const urls=[
+    'https://markets.newyorkfed.org/api/rp/reverserepo/propositions/results/latest.json',
+    'https://markets.newyorkfed.org/api/rp/all/results/lastTwoWeeks.json',
+  ];
+  let j=null;
+  for(const u of urls){
+    try{
+      const r=await fetch(u,{headers:{Accept:'application/json'}});
+      if(r.ok){j=await r.json();break}
+    }catch(e){continue}
+  }
+  if(!j)throw new Error('All NY Fed endpoints failed');
+  
+  // Parse flexibly – NY Fed may use 'rp', 'repo', or root 'operations'
+  const ops=j?.rp?.operations||j?.repo?.operations||j?.operations||[];
+  if(!ops.length)throw new Error('No operations in NY Fed response');
+  
+  // Prefer most recent, look for reverse repo ops (Fed selling securities = draining cash)
+  // NY Fed labels these differently; accept any entry that has a totalAmt field
+  const latest=ops.find(o=>{
+    const det=o?.details||o?.propositions?.details||{};
+    return (det.totalAmtAccepted||det.totalAmtSubmitted||0)>0;
+  })||ops[0];
+  
   const det=latest?.details||latest?.propositions?.details||{};
-  const totalAmt=(det.totalAmtAccepted||det.totalAmtSubmitted||0)/1e6; // to millions
+  const totalAmt=((det.totalAmtAccepted||det.totalAmtSubmitted||0)/1e6); // dollars → millions
   const rate=det.weightedAvgRate||det.weightedAverageRate||0;
   const date=latest.operationDate||latest.date||new Date().toISOString().split('T')[0];
 
@@ -559,10 +576,15 @@ async function fetchNYFed(){
 
 // ─── US Treasury FiscalData (TGA – 比 FRED 快1天) ───
 async function fetchTreasury(){
-  const url='https://api.fiscaldata.treasury.gov/services/api/v1/accounting/od/dts_table_1'
-    +'?fields=record_date,account_type,open_today_bal'
-    +'&filter=account_type:eq:Federal Reserve Account'
-    +'&sort=-record_date&page[size]=730&page[number]=1';
+  // Use URLSearchParams for proper encoding of page[size] bracket syntax
+  const params=new URLSearchParams({
+    'fields':'record_date,account_type,open_today_bal',
+    'filter':'account_type:eq:Federal Reserve Account',
+    'sort':'-record_date',
+    'page[size]':'730',
+    'page[number]':'1'
+  });
+  const url='https://api.fiscaldata.treasury.gov/services/api/v1/accounting/od/dts_table_1?'+params;
   const r=await fetch(url,{headers:{Accept:'application/json'}});
   if(!r.ok)throw new Error('HTTP '+r.status);
   const j=await r.json();
@@ -603,10 +625,14 @@ async function fetchFred(ind){
   const lim=lims[ind.freq]||100;
   const url=`https://api.stlouisfed.org/fred/series/observations?series_id=${ser}&api_key=${S.apiKey}&file_type=json&limit=${lim}&sort_order=desc`;
   const r=await fetch(url);
-  if(!r.ok)throw new Error('HTTP '+r.status);
+  // HTTP 400/403 from FRED = invalid or missing API key
+  if(!r.ok){
+    if(r.status===400||r.status===403)throw new Error('INVALID_KEY');
+    throw new Error('HTTP '+r.status);
+  }
   const j=await r.json();
   if(j.error_message){
-    if(j.error_code===400||/api_key/i.test(j.error_message))throw new Error('INVALID_KEY');
+    if(j.error_code===400||/api_key|not registered|invalid/i.test(j.error_message))throw new Error('INVALID_KEY');
     throw new Error(j.error_message);
   }
   const valid=(j.observations||[]).filter(o=>o.value&&o.value!=='.'&&!isNaN(parseFloat(o.value)));
@@ -688,7 +714,19 @@ async function refreshAll(){
     // FRED fallback for market indicators
     setStatus(`🏦 FRED: ${fredSer(ind)}`,true);
     try{await fetchFred(ind)}
-    catch(e){if(e.message==='INVALID_KEY'){document.getElementById('key-err').style.display='flex';setPill('fred','er');S.busy=false;document.getElementById('refresh-btn').disabled=false;return}S.data[ind.series]={error:true};S.hist[ind.series]=[]}
+    catch(e){
+      if(e.message==='INVALID_KEY'){
+        // Mark ALL unfetched indicators as error, then show banner
+        INDS.filter(i=>i.src==='fred'&&!S.data[i.series]).forEach(i=>{S.data[i.series]={error:true};S.hist[i.series]=[]});
+        INDS.filter(i=>i.src==='fred'&&!S.data[i.series]?.score).forEach(i=>{updateRow(i);updateCbScore(i)});
+        document.getElementById('key-err').style.display='flex';
+        setPill('fred','er');setStatus('⚠️ FRED Key 無效，請點「管理 Key」更換',false);
+        updateOverall();updateChart();
+        document.getElementById('hd-updated').textContent='更新: '+new Date().toLocaleTimeString('zh-TW');
+        document.getElementById('refresh-btn').disabled=false;S.busy=false;return;
+      }
+      S.data[ind.series]={error:true};S.hist[ind.series]=[];
+    }
     updateRow(ind);updateCbScore(ind);
     await delay(85);
   }
@@ -703,7 +741,13 @@ async function refreshAll(){
     setStatus(`🏦 FRED: ${fredSer(ind)}`,true);
     try{await fetchFred(ind);fredOk++}
     catch(e){
-      if(e.message==='INVALID_KEY'){keyBad=true;document.getElementById('key-err').style.display='flex';break}
+      if(e.message==='INVALID_KEY'){
+        keyBad=true;
+        // Mark remaining unfetched as error so table shows N/A not spinner
+        fredInds.forEach(i=>{if(!S.data[i.series]){S.data[i.series]={error:true};S.hist[i.series]=[];updateRow(i);updateCbScore(i)}});
+        document.getElementById('key-err').style.display='flex';
+        setPill('fred','er');break;
+      }
       console.warn('FRED',fredSer(ind),e.message);S.data[ind.series]={error:true};S.hist[ind.series]=[];
     }
     updateRow(ind);updateCbScore(ind);
