@@ -19,7 +19,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,'PingFang 
 a{color:var(--cyan)}button{cursor:pointer;font-family:inherit;font-size:12px}
 ::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
-/* LOADING */
+/* ── LOADING ── */
 #loading{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:14px}
 .ld-logo{font-size:48px;filter:drop-shadow(0 0 20px #00cfff55)}
 .ld-title{font-size:18px;font-weight:700;color:#fff}
@@ -28,7 +28,7 @@ a{color:var(--cyan)}button{cursor:pointer;font-family:inherit;font-size:12px}
 .ld-fill{height:100%;background:var(--cyan);border-radius:2px;animation:ldpulse 1.5s ease-in-out infinite}
 @keyframes ldpulse{0%{width:0%}50%{width:80%}100%{width:100%}}
 
-/* NO-DATA */
+/* ── NO-DATA SCREEN ── */
 #no-data{display:none;align-items:center;justify-content:center;min-height:100vh;padding:20px}
 .nd-card{background:var(--s1);border:1px solid var(--border2);border-radius:12px;padding:36px;max-width:560px;width:100%;text-align:center}
 .nd-card h2{font-size:18px;color:#fff;margin-bottom:10px}
@@ -36,13 +36,10 @@ a{color:var(--cyan)}button{cursor:pointer;font-family:inherit;font-size:12px}
 .nd-steps{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:left;font-size:11px;color:var(--dim);line-height:2}
 .nd-steps code{background:var(--border);padding:1px 5px;border-radius:3px;font-family:monospace;color:var(--text);font-size:11px}
 
-/* DASHBOARD */
+/* ── DASHBOARD ── */
 #dashboard{display:none;flex-direction:column;height:100vh;overflow:hidden}
-@media(max-width:840px){
-  #dashboard{height:auto!important;min-height:100vh;overflow:visible!important}
-}
 
-/* HEADER */
+/* ── HEADER ── */
 #header{background:var(--s1);border-bottom:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0}
 .hd-title{font-size:14px;font-weight:700;color:#fff;white-space:nowrap}.hd-title span{color:var(--cyan)}
 .src-pills{display:flex;gap:4px;flex-wrap:wrap}
@@ -55,7 +52,7 @@ a{color:var(--cyan)}button{cursor:pointer;font-family:inherit;font-size:12px}
 #hd-status{font-size:10px;color:var(--muted)}
 #hd-updated{font-size:10px;color:var(--dim);margin-left:auto;white-space:nowrap}
 
-/* SCORE BAR */
+/* ── SCORE BAR ── */
 #score-bar{background:var(--s2);border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;flex-shrink:0}
 .sb-circle{width:58px;height:58px;border-radius:50%;border:3px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .4s}
 #sb-num{font-size:20px;font-weight:800;line-height:1}
@@ -68,7 +65,7 @@ a{color:var(--cyan)}button{cursor:pointer;font-family:inherit;font-size:12px}
 .sg-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--red),var(--gold) 50%,var(--green));border-radius:3px;transition:width .6s ease}
 .sb-legend{display:flex;gap:12px;font-size:10px;color:var(--muted);flex-wrap:wrap}
 
-/* MAIN */
+/* ── MAIN ── */
 #main{display:flex;flex:1;overflow:hidden}
 #table-panel{flex:1;overflow-y:auto;border-right:1px solid var(--border);min-width:0}
 .grp-hdr{background:var(--s1);padding:5px 12px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:6px}
@@ -92,24 +89,14 @@ a{color:var(--cyan)}button{cursor:pointer;font-family:inherit;font-size:12px}
 .sg-bull{background:var(--green-dim);color:var(--green)}.sg-neu{background:var(--gold-dim);color:var(--gold)}.sg-bear{background:var(--red-dim);color:var(--red)}
 .err-ph{color:var(--muted);font-size:10px;font-style:italic}
 
-/* CHART PANEL */
-#chart-panel{width:420px;min-width:300px;flex-shrink:0;display:flex;flex-direction:column}
-#cp-head{padding:8px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:8px}
-
-/* VIEW TABS */
-.view-tabs{display:flex;gap:3px}
-.vtab{padding:3px 10px;font-size:10px;border:1px solid var(--border2);border-radius:4px;background:none;color:var(--dim)}
-.vtab.active{background:var(--s2);border-color:var(--cyan);color:var(--cyan);font-weight:700}
-
-/* RANGE BUTTONS */
-.range-btns{display:flex;gap:2px;flex-wrap:wrap}
-.rbtn{padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:4px;background:none;color:var(--dim)}
+/* ── CHART ── */
+#chart-panel{width:400px;min-width:300px;flex-shrink:0;display:flex;flex-direction:column}
+#cp-head{padding:9px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+#cp-head h3{font-size:12px;font-weight:600}
+.range-btns{display:flex;gap:3px}
+.rbtn{padding:3px 8px;font-size:10px;border:1px solid var(--border2);border-radius:4px;background:none;color:var(--dim)}
 .rbtn.active{background:var(--cyan);border-color:var(--cyan);color:#000;font-weight:700}
-
-/* LINE VIEW */
-#line-view{display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0}
-#chart-wrap{padding:10px;flex-shrink:0}
-#chart-wrap canvas{width:100%!important}
+#chart-wrap{padding:10px;flex-shrink:0}#chart-wrap canvas{width:100%!important}
 #cb-panel{flex:1;overflow-y:auto;padding:6px 12px 12px;border-top:1px solid var(--border)}
 .cb-grp{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;margin:10px 0 4px}
 .cb-item{display:flex;align-items:center;gap:6px;padding:3px 0}
@@ -118,30 +105,19 @@ a{color:var(--cyan)}button{cursor:pointer;font-family:inherit;font-size:12px}
 .cb-lbl{font-size:11px;color:var(--dim);flex:1;cursor:pointer}
 .cb-sc{font-size:11px;font-weight:700;min-width:28px;text-align:right}
 
-/* BUBBLE VIEW */
-#bubble-view{display:none;flex:1;position:relative;overflow:hidden;cursor:crosshair;min-height:420px}
-#bubbleCanvas{position:absolute;inset:0;width:100%!important;height:100%!important}
-
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{display:inline-block;width:10px;height:10px;border:2px solid var(--border2);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite}
 #tooltip{position:fixed;z-index:1000;pointer-events:none;background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:10px 13px;max-width:290px;font-size:12px;opacity:0;transition:opacity .15s}
 #tooltip h4{font-size:13px;color:#fff;margin-bottom:4px}
 #tooltip p{color:var(--dim);line-height:1.6;font-size:11px}
 #tooltip .tt-src{font-size:10px;color:var(--muted);margin-top:5px;border-top:1px solid var(--border);padding-top:5px}
-@media(max-width:840px){
-  #main{flex-direction:column;overflow:visible!important;flex:none;height:auto}
-  #chart-panel{width:100%;min-width:0;border-top:1px solid var(--border);height:auto;flex:none}
-  #table-panel{border-right:none;max-height:none!important;height:auto;overflow:visible!important;flex:none}
-  #line-view{flex:none;height:auto;overflow:visible}
-  #cb-panel{max-height:none;overflow:visible;flex:none;padding-bottom:20px}
-  #bubble-view{min-height:500px}
-  #ind-table td{padding:8px 10px}
-}
+@media(max-width:840px){#main{flex-direction:column}#chart-panel{width:100%;min-width:0;border-top:1px solid var(--border)}#table-panel{border-right:none;max-height:50vh}}
 @media(max-width:560px){.hide-sm{display:none!important}}
 </style>
 </head>
 <body>
 
+<!-- LOADING -->
 <div id="loading">
   <div class="ld-logo">📊</div>
   <div class="ld-title">宏觀經濟儀表板</div>
@@ -149,22 +125,25 @@ a{color:var(--cyan)}button{cursor:pointer;font-family:inherit;font-size:12px}
   <div class="ld-msg" id="ld-msg">正在載入數據…</div>
 </div>
 
+<!-- NO DATA -->
 <div id="no-data">
   <div class="nd-card">
     <div style="font-size:40px;margin-bottom:12px">⚙️</div>
     <h2>尚未有數據（data.json 不存在）</h2>
     <p>本儀表板使用 <strong>GitHub Actions</strong> 每日自動抓取數據。<br>請按照以下步驟完成初次設定：</p>
     <div class="nd-steps">
-      <strong>① 設定 Repository Secret</strong><br>
-      Settings → Secrets → Actions → New secret<br>
+      <strong>① 在 GitHub Repo 設定 Secret</strong><br>
+      Settings → Secrets and variables → Actions → New repository secret<br>
       名稱：<code>FRED_API_KEY</code>　值：你的 FRED API Key<br><br>
-      <strong>② 手動觸發 GitHub Actions</strong><br>
+      <strong>② 手動執行一次 GitHub Actions</strong><br>
       Actions → 「📊 Update Macro Dashboard Data」→ Run workflow<br><br>
-      <strong>③ 等約 3 分鐘後刷新頁面</strong>
+      <strong>③ 等待 data.json 生成後刷新頁面</strong><br>
+      約 2–3 分鐘後，數據就會自動出現。之後每個工作日 14:00（台灣）自動更新。
     </div>
   </div>
 </div>
 
+<!-- DASHBOARD -->
 <div id="dashboard">
   <div id="header">
     <span class="hd-title">📊 <span>MACRO</span> DASHBOARD</span>
@@ -201,34 +180,18 @@ a{color:var(--cyan)}button{cursor:pointer;font-family:inherit;font-size:12px}
         <tbody id="tbl-body"></tbody>
       </table>
     </div>
-
     <div id="chart-panel">
       <div id="cp-head">
-        <div class="view-tabs">
-          <button class="vtab active" onclick="setView('line',this)">📈 趨勢</button>
-          <button class="vtab" onclick="setView('bubble',this)">🫧 泡泡</button>
-        </div>
-        <div class="range-btns" id="range-btns">
-          <button class="rbtn" onclick="setRange(7,this)">1W</button>
-          <button class="rbtn" onclick="setRange(30,this)">1M</button>
+        <h3>📈 評分趨勢 (0–10)</h3>
+        <div class="range-btns">
           <button class="rbtn" onclick="setRange(90,this)">3M</button>
           <button class="rbtn active" onclick="setRange(180,this)">6M</button>
           <button class="rbtn" onclick="setRange(365,this)">1Y</button>
           <button class="rbtn" onclick="setRange(730,this)">2Y</button>
-          <button class="rbtn" onclick="setRange(9999,this)">ALL</button>
         </div>
       </div>
-
-      <!-- 趨勢折線圖 -->
-      <div id="line-view">
-        <div id="chart-wrap"><canvas id="myChart" height="300"></canvas></div>
-        <div id="cb-panel"><div class="cb-grp">選擇指標比較</div></div>
-      </div>
-
-      <!-- 泡泡圖 -->
-      <div id="bubble-view">
-        <canvas id="bubbleCanvas"></canvas>
-      </div>
+      <div id="chart-wrap"><canvas id="myChart" height="220"></canvas></div>
+      <div id="cb-panel"><div class="cb-grp">選擇指標比較</div></div>
     </div>
   </div>
 </div>
@@ -239,91 +202,102 @@ a{color:var(--cyan)}button{cursor:pointer;font-family:inherit;font-size:12px}
 'use strict';
 const COLORS=['#00cfff','#3fb950','#f85149','#d29922','#8957e5','#f0883e','#39d353','#ff7b72','#79c0ff','#d2a8ff','#ffa657','#7ee787','#a9d6fb','#e3b341','#ff6e76','#ffdf5d','#9ecbff','#58a6ff','#56d364','#ff8c00','#a371f7','#2ea043','#6495ed','#da70d6','#20b2aa','#ffb6c1','#7b68ee','#00fa9a','#ff7f50','#40e0d0'];
 
+// 指標顯示順序（與 Python INDICATORS 清單對應）
 const IND_ORDER=[
-  {sid:'VIXCLS',  no:1,  grp:'sentiment',  cn:'恐慌指數（波動率指標）',       sn:'VIX',    def:true},
-  {sid:'GOLD',    no:2,  grp:'commodities', cn:'黃金 (GOLD)',                  sn:'GOLD',   def:false},
-  {sid:'SILVER',  no:3,  grp:'commodities', cn:'白銀 (SILVER)',                sn:'SILV',   def:false},
-  {sid:'WTI',     no:4,  grp:'commodities', cn:'原油 WTI (CL1!)',              sn:'WTI',    def:false},
-  {sid:'BRENT',   no:5,  grp:'commodities', cn:'原油 Brent (BRENT)',           sn:'BRENT',  def:false},
-  {sid:'BTC.D',   no:6,  grp:'crypto',      cn:'比特幣市占率 (BTC.D)',         sn:'BTC.D',  def:false},
-  {sid:'DXY',     no:7,  grp:'market',      cn:'美元指數 DXY (DTWEXBGS)',      sn:'DXY',    def:false},
-  {sid:'OTHERS.D',no:8,  grp:'crypto',      cn:'山寨幣市占率 (OTHERS.D)',      sn:'ALT.D',  def:false},
-  {sid:'USDC.D',  no:9,  grp:'crypto',      cn:'穩定幣市占率 USDC',            sn:'USDC',   def:false},
-  {sid:'USDT.D',  no:10, grp:'crypto',      cn:'穩定幣市占率 USDT',            sn:'USDT',   def:false},
-  {sid:'USINTR',  no:11, grp:'us_broad',    cn:'美國利率（廣義）USINTR',       sn:'USINTR', def:false},
-  {sid:'WALCL',   no:12, grp:'liquidity',   cn:'美聯儲資產負債表 (WALCL)',     sn:'WALCL',  def:true},
-  {sid:'M2SL',    no:13, grp:'liquidity',   cn:'美國 M2 貨幣供給量 (M2SL)',    sn:'M2SL',   def:false},
-  {sid:'TGA',     no:14, grp:'liquidity',   cn:'財政部一般賬戶 TGA (WTREGEN)', sn:'TGA',    def:false},
-  {sid:'RRP_AMT', no:15, grp:'liquidity',   cn:'隔夜逆回購每日 (RRPONTSYD)',   sn:'RRP/D',  def:true},
-  {sid:'RRP_TL',  no:16, grp:'liquidity',   cn:'逆回購餘額 Total Level',       sn:'RRP/TL', def:false},
-  {sid:'RRP_RATE',no:17, grp:'liquidity',   cn:'逆回購中標利率 RRPONTSY AWARD',sn:'RRP/R',  def:false},
-  {sid:'FEDFUNDS',no:18, grp:'us_rates',    cn:'聯邦基金有效利率 (FEDFUNDS)',  sn:'FF',     def:true},
-  {sid:'DGS10',   no:19, grp:'us_rates',    cn:'美國10年債殖利率 (US10)',      sn:'10Y',    def:true},
-  {sid:'DGS2',    no:20, grp:'us_rates',    cn:'美國2年期公債殖利率 (DGS2)',   sn:'2Y',     def:false},
-  {sid:'DFII10',  no:21, grp:'us_rates',    cn:'10年公債實際殖利率 (GDGS10)',  sn:'TIPS',   def:false},
-  {sid:'JPINTR',  no:24, grp:'global',      cn:'日本利率 JPINTR',              sn:'JP',     def:false},
-  {sid:'CNINTR',  no:25, grp:'global',      cn:'中國利率 CNINTR',              sn:'CN',     def:false},
-  {sid:'DEINTR',  no:26, grp:'global',      cn:'德國利率 DEINTR',              sn:'DE',     def:false},
-  {sid:'ININTR',  no:27, grp:'global',      cn:'印度利率 ININTR',              sn:'IN',     def:false},
-  {sid:'GBINTR',  no:28, grp:'global',      cn:'英國利率 GBINTR',              sn:'GB',     def:false},
-  {sid:'FRINTR',  no:29, grp:'global',      cn:'法國利率 FRINTR',              sn:'FR',     def:false},
-  {sid:'ITINTR',  no:30, grp:'global',      cn:'義大利利率 ININTR',            sn:'IT',     def:false},
-  {sid:'BRINTR',  no:31, grp:'global',      cn:'巴西利率 BRINTR',              sn:'BR',     def:false},
-  {sid:'CAINTR',  no:32, grp:'global',      cn:'加拿大利率 CAINTR',            sn:'CA',     def:false},
+  {sid:'VIXCLS',  no:1,  grp:'sentiment',cn:'恐慌指數（波動率指標）',              def:true},
+  {sid:'GOLD',    no:2,  grp:'commodities',cn:'黃金 (GOLD)',                       def:false},
+  {sid:'SILVER',  no:3,  grp:'commodities',cn:'白銀 (SILVER)',                     def:false},
+  {sid:'WTI',     no:4,  grp:'commodities',cn:'原油 WTI (CL1!)',                   def:false},
+  {sid:'BRENT',   no:5,  grp:'commodities',cn:'原油 Brent (BRENT)',                def:false},
+  {sid:'BTC.D',   no:6,  grp:'crypto',    cn:'比特幣市占率 (BTC.D)',               def:false},
+  {sid:'DXY',     no:7,  grp:'market',    cn:'美元指數 DXY (DTWEXBGS)',            def:false},
+  {sid:'OTHERS.D',no:8,  grp:'crypto',    cn:'山寨幣市占率 (OTHERS.D)',            def:false},
+  {sid:'USDC.D',  no:9,  grp:'crypto',    cn:'穩定幣市占率 USDC',                 def:false},
+  {sid:'USDT.D',  no:10, grp:'crypto',    cn:'穩定幣市占率 USDT',                 def:false},
+  {sid:'USINTR',  no:11, grp:'us_broad',  cn:'美國利率（廣義）USINTR',            def:false},
+  {sid:'WALCL',   no:12, grp:'liquidity', cn:'美聯儲資產負債表 (WALCL)',           def:true},
+  {sid:'M2SL',    no:13, grp:'liquidity', cn:'美國 M2 貨幣供給量 (M2SL)',         def:false},
+  {sid:'TGA',     no:14, grp:'liquidity', cn:'財政部一般賬戶 TGA (WTREGEN)',       def:false},
+  {sid:'RRP_AMT', no:15, grp:'liquidity', cn:'隔夜逆回購每日 (RRPONTSYD)',         def:true},
+  {sid:'RRP_TL',  no:16, grp:'liquidity', cn:'逆回購餘額 Total Level',             def:false},
+  {sid:'RRP_RATE',no:17, grp:'liquidity', cn:'逆回購中標利率 RRPONTSY AWARD',      def:false},
+  {sid:'FEDFUNDS',no:18, grp:'us_rates',  cn:'聯邦基金有效利率 (FEDFUNDS)',        def:true},
+  {sid:'DGS10',   no:19, grp:'us_rates',  cn:'美國10年債殖利率 (US10)',            def:true},
+  {sid:'DGS2',    no:20, grp:'us_rates',  cn:'美國2年期公債殖利率 (DGS2)',         def:false},
+  {sid:'DFII10',  no:21, grp:'us_rates',  cn:'10年公債實際殖利率 (GDGS10)',        def:false},
+  {sid:'JPINTR',  no:24, grp:'global',   cn:'日本利率 JPINTR',                    def:false},
+  {sid:'CNINTR',  no:25, grp:'global',   cn:'中國利率 CNINTR',                    def:false},
+  {sid:'DEINTR',  no:26, grp:'global',   cn:'德國利率 DEINTR',                    def:false},
+  {sid:'ININTR',  no:27, grp:'global',   cn:'印度利率 ININTR',                    def:false},
+  {sid:'GBINTR',  no:28, grp:'global',   cn:'英國利率 GBINTR',                    def:false},
+  {sid:'FRINTR',  no:29, grp:'global',   cn:'法國利率 FRINTR',                    def:false},
+  {sid:'ITINTR',  no:30, grp:'global',   cn:'義大利利率 ININTR',                  def:false},
+  {sid:'BRINTR',  no:31, grp:'global',   cn:'巴西利率 BRINTR',                    def:false},
+  {sid:'CAINTR',  no:32, grp:'global',   cn:'加拿大利率 CAINTR',                  def:false},
 ];
 
 const GRPS={sentiment:'市場情緒',commodities:'商品原物料',crypto:'加密貨幣市占',market:'市場指標',us_broad:'美國廣義利率',liquidity:'Fed 流動性',us_rates:'美國利率',global:'全球央行利率'};
 const SRC_CLS={fred:'sb-fred',yahoo:'sb-yahoo',coingecko:'sb-cg',nyfed:'sb-nyfed',treasury:'sb-tsy'};
 const SRC_LABEL={fred:'FRED',yahoo:'Yahoo Finance',coingecko:'CoinGecko',nyfed:'NY Fed',treasury:'US Treasury'};
 
-const S={data:{},hist:{},checked:new Set(),range:180,chart:null,currentView:'line'};
+const S={data:{},hist:{},checked:new Set(),range:180,chart:null};
 
-// ── 從 data.json 載入 ────────────────────────────────────
+// ── 從 data.json 載入 ──
 async function loadData(){
   document.getElementById('ld-msg').textContent='正在載入 data.json …';
   try{
-    const r=await fetch('data.json?t='+Date.now());
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const j=await r.json();
+    const r = await fetch('data.json?t='+Date.now());
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const j = await r.json();
     document.getElementById('loading').style.display='none';
     document.getElementById('dashboard').style.display='flex';
     populate(j);
   }catch(e){
     document.getElementById('loading').style.display='none';
-    document.getElementById('no-data').style.display='flex';
-    if(!e.message.includes('404'))document.querySelector('.nd-card h2').textContent='載入失敗：'+e.message;
+    if(e.message.includes('404')||e.message.includes('HTTP')){
+      document.getElementById('no-data').style.display='flex';
+    } else {
+      document.getElementById('no-data').style.display='flex';
+      document.querySelector('.nd-card h2').textContent='載入失敗：'+e.message;
+    }
   }
 }
 
 function populate(j){
-  S.data=j.indicators||{};
-  for(const[sid,d]of Object.entries(S.data)){
-    S.hist[sid]=(d.hist||[]).map(([ts,sc])=>({x:new Date(ts),y:sc}));
+  // Store data
+  S.data = j.indicators||{};
+  // Build hist lookup
+  for(const[sid,d] of Object.entries(S.data)){
+    S.hist[sid] = (d.hist||[]).map(([ts,sc])=>({x:new Date(ts),y:sc}));
   }
   // Overall score
-  const avg=j.overall_score;
+  const avg = j.overall_score;
   if(avg!=null){
-    const col=avg>=7?'var(--green)':avg<4?'var(--red)':'var(--gold)';
-    const lbl=avg>=7?'市場環境偏多・風險資產獲支撐':avg<4?'市場環境偏空・注意下行風險':'市場環境中性・謹慎觀望';
+    const col = avg>=7?'var(--green)':avg<4?'var(--red)':'var(--gold)';
+    const glow = avg>=7?'0 0 18px #2eba6244':avg<4?'0 0 18px #f0484844':'0 0 18px #d4a01744';
+    const lbl = avg>=7?'市場環境偏多・風險資產獲支撐':avg<4?'市場環境偏空・注意下行風險':'市場環境中性・謹慎觀望';
     document.getElementById('sb-num').textContent=avg.toFixed(1);
     document.getElementById('sb-num').style.color=col;
     document.getElementById('sb-circle').style.borderColor=col;
-    document.getElementById('sb-circle').style.boxShadow=avg>=7?'0 0 18px #2eba6244':avg<4?'0 0 18px #f0484844':'0 0 18px #d4a01744';
+    document.getElementById('sb-circle').style.boxShadow=glow;
     document.getElementById('sb-signal').textContent=lbl;
     document.getElementById('sg-fill').style.width=(avg/10*100)+'%';
   }
+  // Updated time
   if(j.last_updated){
-    const dt=new Date(j.last_updated);
+    const dt = new Date(j.last_updated);
     document.getElementById('hd-updated').textContent='數據更新: '+dt.toLocaleString('zh-TW',{timeZone:'Asia/Taipei'});
   }
   // Source pills
-  const srcs=new Set(Object.values(S.data).map(d=>d.src).filter(Boolean));
-  const map={fred:'sp-fred',yahoo:'sp-yahoo',coingecko:'sp-cg',nyfed:'sp-nyfed',treasury:'sp-tsy'};
-  Object.entries(map).forEach(([s,id])=>{const el=document.getElementById(id);if(el)el.classList.toggle('ok',srcs.has(s))});
-  buildTable();buildCheckboxes();initLineChart();updateChart();
+  const srcs = new Set(Object.values(S.data).map(d=>d.src).filter(Boolean));
+  ['fred','yahoo','coingecko','nyfed','treasury'].forEach(s=>{
+    const el=document.getElementById('sp-'+s.replace('coingecko','cg').replace('nyfed','nyfed').replace('treasury','tsy').replace('yahoo','yahoo').replace('fred','fred'));
+    if(el) el.classList.toggle('ok', srcs.has(s));
+  });
+  buildTable();buildCheckboxes();initChart();updateChart();
 }
 
-// ── TABLE ────────────────────────────────────────────────
+// ── Table ──
 function buildTable(){
   const tbody=document.getElementById('tbl-body');tbody.innerHTML='';
   let lastGrp=null;
@@ -332,13 +306,18 @@ function buildTable(){
     if(meta.grp!==lastGrp){
       lastGrp=meta.grp;
       const srcKey=d?.src||'fred';
+      const srcCls=SRC_CLS[srcKey]||'';
+      const srcLbl=SRC_LABEL[srcKey]||srcKey;
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td colspan="8" style="padding:0"><div class="grp-hdr">${GRPS[meta.grp]||meta.grp}<span class="src-badge ${SRC_CLS[srcKey]||''}">${SRC_LABEL[srcKey]||srcKey}</span></div></td>`;
+      tr.innerHTML=`<td colspan="8" style="padding:0"><div class="grp-hdr">${GRPS[meta.grp]||meta.grp}<span class="src-badge ${srcCls}">${srcLbl}</span></div></td>`;
       tbody.appendChild(tr);
     }
-    const tr=document.createElement('tr');tr.id='r-'+meta.sid;
+    const tr=document.createElement('tr');
+    tr.id='r-'+meta.sid;
+    const srcCls=SRC_CLS[d?.src||'fred']||'';
+    const dispId=meta.sid;
     tr.innerHTML=`<td class="c-no">${meta.no}</td>
-      <td class="c-ser">${meta.sid}</td>
+      <td class="c-ser ${srcCls}">${dispId}</td>
       <td class="c-name">${meta.cn}<small>${d?.desc||''}</small></td>
       <td class="c-val"></td><td class="c-date hide-sm"></td>
       <td></td><td></td><td class="hide-sm"></td>`;
@@ -379,26 +358,21 @@ function fillRow(meta,d){
   td[7].innerHTML=`<span class="sig ${sg.c}">${sg.t}</span>`;
 }
 
-// ── LINE CHART ───────────────────────────────────────────
-function initLineChart(){
+// ── Chart ──
+function initChart(){
   const ctx=document.getElementById('myChart').getContext('2d');
-  if(S.chart)S.chart.destroy();
   S.chart=new Chart(ctx,{type:'line',data:{datasets:[]},options:{
-    responsive:true,maintainAspectRatio:true,
-    interaction:{mode:'index',intersect:false},animation:{duration:250},
+    responsive:true,maintainAspectRatio:true,interaction:{mode:'index',intersect:false},animation:{duration:250},
     scales:{
-      x:{type:'time',time:{unit:'month',displayFormats:{week:'MMM dd',month:'MMM yy'}},grid:{color:'#1e2d4766'},ticks:{color:'#3d5068',font:{size:10},maxTicksLimit:8}},
+      x:{type:'time',time:{unit:'month',displayFormats:{month:'MMM yy'}},grid:{color:'#1e2d4766'},ticks:{color:'#3d5068',font:{size:10},maxTicksLimit:8}},
       y:{min:0,max:10,grid:{color:'#1e2d4766'},ticks:{color:'#3d5068',font:{size:10},stepSize:2,callback:v=>v}}
     },
     plugins:{legend:{display:false},tooltip:{backgroundColor:'#162036',borderColor:'#253655',borderWidth:1,titleColor:'#c9d5e3',bodyColor:'#6a7d96',padding:10,callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y.toFixed(1)}`}}}
   }});
 }
-
 function updateChart(){
   if(!S.chart)return;
-  const cutoff=new Date();
-  if(S.range<9999)cutoff.setDate(cutoff.getDate()-S.range);
-  else cutoff.setFullYear(2000);
+  const cutoff=new Date();cutoff.setDate(cutoff.getDate()-S.range);
   const datasets=[{label:'中性線',data:[{x:cutoff,y:5},{x:new Date(),y:5}],borderColor:'#1e2d47',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false,tension:0,order:99}];
   let ci=0;
   IND_ORDER.forEach(meta=>{
@@ -410,15 +384,9 @@ function updateChart(){
   });
   S.chart.data.datasets=datasets;S.chart.update();
 }
+function setRange(d,btn){S.range=d;document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');updateChart()}
 
-function setRange(d,btn){
-  S.range=d;
-  document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-  updateChart();
-}
-
-// ── CHECKBOXES ───────────────────────────────────────────
+// ── Checkboxes ──
 function buildCheckboxes(){
   const panel=document.getElementById('cb-panel');panel.innerHTML='';
   let lastGrp=null;
@@ -440,176 +408,29 @@ function buildCheckboxes(){
 }
 function toggleSeries(s){S.checked.has(s)?S.checked.delete(s):S.checked.add(s);updateChart()}
 
-// ── VIEW TOGGLE ──────────────────────────────────────────
-function setView(mode,btn){
-  S.currentView=mode;
-  document.querySelectorAll('.vtab').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-  const lineV=document.getElementById('line-view');
-  const bubV=document.getElementById('bubble-view');
-  const rangeB=document.getElementById('range-btns');
-  if(mode==='line'){
-    lineV.style.display='flex';bubV.style.display='none';rangeB.style.display='flex';
-    if(BA)cancelAnimationFrame(BA);
-  }else{
-    lineV.style.display='none';bubV.style.display='block';rangeB.style.display='none';
-    initBubbleChart();
-  }
-}
-
-// ── BUBBLE CHART ─────────────────────────────────────────
-let BA=null, bubbles=[], hovB=null;
-
-// 星星背景
-const STARS=Array.from({length:100},()=>({
-  x:Math.random(),y:Math.random(),r:Math.random()*1.2+0.2,a:Math.random()*0.7+0.2
-}));
-
-function scColor(sc){
-  if(sc>=8)return{f:'#00cfff',l:'#80e7ff',d:'#003d5c'};
-  if(sc>=7)return{f:'#2eba62',l:'#7fef9f',d:'#0a1f0f'};
-  if(sc>=5)return{f:'#39d353',l:'#9ef5a8',d:'#0a2010'};
-  if(sc>=4)return{f:'#d4a017',l:'#ffc84b',d:'#2b1f04'};
-  if(sc>=2.5)return{f:'#f0883e',l:'#ffbe80',d:'#2a1202'};
-  return{f:'#f04848',l:'#ff8080',d:'#2d0e0e'};
-}
-
-function initBubbleChart(){
-  const canvas=document.getElementById('bubbleCanvas');
-  const pnl=document.getElementById('bubble-view');
-  const W=pnl.clientWidth||400, H=pnl.clientHeight||480;
-  canvas.width=W; canvas.height=H;
-  // Build bubbles
-  bubbles=[];
-  IND_ORDER.forEach(meta=>{
-    const d=S.data[meta.sid];
-    if(!d||d.error||d.score==null)return;
-    const sc=d.score;
-    const r=16+sc*3.6; // 16-52px
-    const ang=Math.random()*Math.PI*2;
-    const dist=(0.15+Math.random()*0.3)*Math.min(W,H);
-    bubbles.push({
-      sid:meta.sid, cn:meta.cn, sn:meta.sn||meta.sid, score:sc,
-      r, ...scColor(sc),
-      x:W/2+Math.cos(ang)*dist, y:H/2+Math.sin(ang)*dist,
-      vx:(Math.random()-0.5)*0.4, vy:(Math.random()-0.5)*0.4
-    });
-  });
-  // Mouse / touch
-  canvas.onmousemove=e=>{const rc=canvas.getBoundingClientRect(),mx=e.clientX-rc.left,my=e.clientY-rc.top;hovB=bubbles.find(b=>{const dx=b.x-mx,dy=b.y-my;return Math.sqrt(dx*dx+dy*dy)<b.r})||null};
-  canvas.onmouseleave=()=>hovB=null;
-  canvas.ontouchmove=e=>{e.preventDefault();const rc=canvas.getBoundingClientRect(),t=e.touches[0],mx=t.clientX-rc.left,my=t.clientY-rc.top;hovB=bubbles.find(b=>{const dx=b.x-mx,dy=b.y-my;return Math.sqrt(dx*dx+dy*dy)<b.r})||null};
-  if(BA)cancelAnimationFrame(BA);
-  animBubble();
-}
-
-function animBubble(){
-  const canvas=document.getElementById('bubbleCanvas');
-  if(!canvas||S.currentView!=='bubble'){BA=null;return}
-  const ctx=canvas.getContext('2d');
-  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2;
-  // Clear with slight trail
-  ctx.fillStyle='rgba(7,11,15,0.3)';ctx.fillRect(0,0,W,H);
-  // Stars
-  STARS.forEach(s=>{
-    ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);
-    ctx.fillStyle=`rgba(255,255,255,${s.a})`;ctx.fill();
-  });
-  // Physics
-  for(let i=0;i<bubbles.length;i++){
-    const b=bubbles[i];
-    b.vx+=(cx-b.x)*0.0006; b.vy+=(cy-b.y)*0.0006;
-    for(let j=i+1;j<bubbles.length;j++){
-      const b2=bubbles[j];
-      const dx=b.x-b2.x,dy=b.y-b2.y;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      const md=b.r+b2.r+10;
-      if(dist<md&&dist>0.1){const f=(md-dist)/dist*0.035;b.vx+=dx*f;b.vy+=dy*f;b2.vx-=dx*f;b2.vy-=dy*f}
-    }
-    b.vx*=0.93;b.vy*=0.93;
-    b.vx+=(Math.random()-0.5)*0.04;b.vy+=(Math.random()-0.5)*0.04;
-    b.x+=b.vx;b.y+=b.vy;
-    const pad=b.r+4;
-    if(b.x<pad){b.x=pad;b.vx=Math.abs(b.vx)*0.5}
-    if(b.x>W-pad){b.x=W-pad;b.vx=-Math.abs(b.vx)*0.5}
-    if(b.y<pad){b.y=pad;b.vy=Math.abs(b.vy)*0.5}
-    if(b.y>H-pad){b.y=H-pad;b.vy=-Math.abs(b.vy)*0.5}
-  }
-  // Draw bubbles
-  bubbles.forEach(b=>{
-    const isH=b===hovB;
-    const r=isH?b.r*1.12:b.r;
-    // Outer glow
-    const gr=ctx.createRadialGradient(b.x,b.y,r*0.4,b.x,b.y,r+14);
-    gr.addColorStop(0,b.f+'44');gr.addColorStop(1,b.f+'00');
-    ctx.beginPath();ctx.arc(b.x,b.y,r+14,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();
-    // Main bubble
-    const gm=ctx.createRadialGradient(b.x-r*0.3,b.y-r*0.35,r*0.05,b.x,b.y,r);
-    gm.addColorStop(0,b.l+'ee');gm.addColorStop(0.45,b.f+'cc');gm.addColorStop(1,b.d+'99');
-    ctx.beginPath();ctx.arc(b.x,b.y,r,0,Math.PI*2);
-    ctx.fillStyle=gm;ctx.fill();
-    // Border
-    ctx.strokeStyle=isH?b.l:b.f+'99';ctx.lineWidth=isH?2:1;ctx.stroke();
-    // Shine highlight
-    const sh=ctx.createRadialGradient(b.x-r*0.35,b.y-r*0.35,0,b.x-r*0.2,b.y-r*0.2,r*0.55);
-    sh.addColorStop(0,'rgba(255,255,255,0.35)');sh.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.beginPath();ctx.arc(b.x,b.y,r,0,Math.PI*2);ctx.fillStyle=sh;ctx.fill();
-    // Labels
-    const fs=Math.max(8,Math.min(13,r*0.38));
-    ctx.fillStyle='#fff';ctx.font=`bold ${fs}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(b.sn,b.x,b.y-fs*0.45);
-    ctx.font=`${Math.max(7,fs*0.85)}px sans-serif`;ctx.fillStyle=b.l;
-    ctx.fillText(b.score.toFixed(1),b.x,b.y+fs*0.75);
-  });
-  // Hover tooltip on canvas
-  if(hovB){
-    const b=hovB;
-    const tw=160,th=42,tx=Math.min(b.x-tw/2,W-tw-4),ty=Math.max(4,b.y-b.r-52);
-    ctx.fillStyle='rgba(13,20,32,0.92)';
-    ctx.strokeStyle=b.f;ctx.lineWidth=1.5;
-    ctx.beginPath();
-    if(ctx.roundRect)ctx.roundRect(tx,ty,tw,th,5);else ctx.rect(tx,ty,tw,th);
-    ctx.fill();ctx.stroke();
-    ctx.fillStyle='#fff';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.textBaseline='top';
-    const nm=b.cn.length>16?b.cn.slice(0,16)+'…':b.cn;
-    ctx.fillText(nm,tx+8,ty+6);
-    ctx.fillStyle=b.l;ctx.font=`bold 13px sans-serif`;
-    ctx.fillText(`評分: ${b.score.toFixed(1)} / 10`,tx+8,ty+22);
-  }
-  // Legend
-  const legend=[{c:'#00cfff',t:'9–10 極度看漲'},{c:'#2eba62',t:'7–9 看漲'},{c:'#d4a017',t:'4–7 中性'},{c:'#f04848',t:'0–4 看跌'}];
-  let lx=8;
-  legend.forEach(l=>{
-    ctx.fillStyle=l.c+'cc';ctx.beginPath();ctx.arc(lx+5,H-10,4,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle=l.c;ctx.font='9px sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';
-    ctx.fillText(l.t,lx+13,H-10);lx+=ctx.measureText(l.t).width+25;
-  });
-  BA=requestAnimationFrame(animBubble);
-}
-
-// ── RELOAD ───────────────────────────────────────────────
+// ── Reload ──
 async function reloadData(){
-  const btn=document.getElementById('refresh-btn');btn.disabled=true;
+  const btn=document.getElementById('refresh-btn');
+  btn.disabled=true;
   document.getElementById('hd-status').innerHTML='<span class="spin"></span> 重新載入…';
   try{
     const r=await fetch('data.json?t='+Date.now());
     if(!r.ok)throw new Error('HTTP '+r.status);
     const j=await r.json();
-    S.data={};S.hist={};S.checked=new Set();
-    if(S.chart){S.chart.destroy();S.chart=null}
-    if(BA){cancelAnimationFrame(BA);BA=null}
+    // Reset state
+    S.data={};S.hist={};S.checked=new Set();S.chart?.destroy();
     document.getElementById('tbl-body').innerHTML='';
     document.getElementById('cb-panel').innerHTML='<div class="cb-grp">選擇指標比較</div>';
     populate(j);
-    if(S.currentView==='bubble')initBubbleChart();
     document.getElementById('hd-status').textContent='已刷新 ✓';
   }catch(e){
-    document.getElementById('hd-status').textContent='刷新失敗: '+e.message;
+    document.getElementById('hd-status').textContent='刷新失敗：'+e.message;
   }
   btn.disabled=false;
 }
 
-window.addEventListener('DOMContentLoaded',loadData);
+// ── Init ──
+window.addEventListener('DOMContentLoaded', loadData);
 </script>
 </body>
 </html>
