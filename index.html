@@ -38,6 +38,10 @@ a{color:var(--cyan)}button{cursor:pointer;font-family:inherit;font-size:12px}
 
 /* ── DASHBOARD ── */
 #dashboard{display:none;flex-direction:column;height:100vh;overflow:hidden}
+/* ── MOBILE: 改為可捲動長頁面 ── */
+@media(max-width:840px){
+  #dashboard{height:auto!important;min-height:100vh;overflow:visible!important}
+}
 
 /* ── HEADER ── */
 #header{background:var(--s1);border-bottom:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0}
@@ -111,7 +115,16 @@ a{color:var(--cyan)}button{cursor:pointer;font-family:inherit;font-size:12px}
 #tooltip h4{font-size:13px;color:#fff;margin-bottom:4px}
 #tooltip p{color:var(--dim);line-height:1.6;font-size:11px}
 #tooltip .tt-src{font-size:10px;color:var(--muted);margin-top:5px;border-top:1px solid var(--border);padding-top:5px}
-@media(max-width:840px){#main{flex-direction:column}#chart-panel{width:100%;min-width:0;border-top:1px solid var(--border)}#table-panel{border-right:none;max-height:50vh}}
+@media(max-width:840px){
+  #main{flex-direction:column;overflow:visible!important;flex:none;height:auto}
+  #chart-panel{width:100%;min-width:0;border-top:1px solid var(--border);height:auto;flex:none}
+  #table-panel{border-right:none;max-height:none!important;height:auto;overflow:visible!important;flex:none}
+  #cb-panel{max-height:none;overflow:visible;flex:none;padding-bottom:20px}
+  /* 表格行在手機上稍大一點好點擊 */
+  #ind-table td{padding:8px 10px}
+  /* 圖表在手機上高度適中 */
+  #chart-wrap canvas{max-height:220px}
+}
 @media(max-width:560px){.hide-sm{display:none!important}}
 </style>
 </head>
