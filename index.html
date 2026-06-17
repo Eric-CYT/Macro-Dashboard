@@ -6,6 +6,9 @@
 <title>宏觀經濟儀表板 | Macro Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
 <style>
 :root{
   --bg:#020408;--s1:#080d15;--s2:#0d1520;--card:#111d2e;
@@ -111,12 +114,15 @@ a{color:var(--cyan)}button{cursor:pointer;font-family:inherit;font-size:12px}
 .lpill .ldot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .lpill .lsc{color:var(--dim);font-size:10px;margin-left:2px}
 
-/* BUBBLE VIEW (OMEGA DEEP COSMOS) */
-#view-bubble{height:100%;display:none;position:relative}
-#cosmosCanvas{position:absolute;inset:0;width:100%!important;height:100%!important;cursor:crosshair}
-#cosmos-legend{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:14px;pointer-events:none}
+/* BUBBLE VIEW (OMEGA DEEP COSMOS - Three.js) */
+#view-bubble{height:100%;display:none;position:relative;overflow:hidden;background:#030308}
+#cosmos-legend{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:14px;pointer-events:none;z-index:10}
 .cl-item{display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(200,216,240,0.7)}
 .cl-dot{width:8px;height:8px;border-radius:50%}
+/* CSS2D Labels */
+.cosmos-lbl{color:rgba(200,220,255,0.95);font-family:'Segoe UI',sans-serif;text-align:center;pointer-events:none;line-height:1.4;user-select:none}
+.cosmos-lbl b{font-size:11px;display:block;letter-spacing:.5px;text-shadow:0 0 10px rgba(0,200,255,.9),0 0 4px rgba(0,200,255,.6)}
+.cosmos-lbl small{font-size:10px;color:rgba(120,210,255,.9);text-shadow:0 0 6px rgba(0,180,255,.7)}
 
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{display:inline-block;width:10px;height:10px;border:2px solid var(--border2);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite}
@@ -222,9 +228,9 @@ a{color:var(--cyan)}button{cursor:pointer;font-family:inherit;font-size:12px}
       <div id="line-legend" id="line-legend"></div>
     </div>
 
-    <!-- OMEGA DEEP COSMOS BUBBLE VIEW -->
+    <!-- OMEGA DEEP COSMOS - Three.js Scene Container -->
     <div id="view-bubble">
-      <canvas id="cosmosCanvas"></canvas>
+      <!-- Three.js will inject: WebGLRenderer canvas + CSS2DRenderer overlay -->
       <div id="cosmos-legend">
         <div class="cl-item"><div class="cl-dot" style="background:#c0f0ff"></div>9–10 極度看漲</div>
         <div class="cl-item"><div class="cl-dot" style="background:#00cfff"></div>7–9 看漲</div>
@@ -425,245 +431,217 @@ function setMainView(v,btn){
 }
 
 // ══════════════════════════════════════════════════════════
-// OMEGA DEEP COSMOS – 深宇宙泡泡圖
+// OMEGA DEEP COSMOS – Three.js 3D 深宇宙
 // ══════════════════════════════════════════════════════════
-let cosmosAF=null, cBubbles=[], cHov=null, cT=0;
 
-// 宇宙星塵
-const DUST=Array.from({length:180},()=>({
-  rx:Math.random(),ry:Math.random(),
-  vx:(Math.random()-0.5)*2e-4,vy:(Math.random()-0.5)*1.5e-4,
-  r:Math.random()*1.1+0.15,
-  a:Math.random()*0.35+0.05,
-  hue:Math.floor(Math.random()*80+180) // 180-260: blue-purple
-}));
-
-// 大星星
-const STARS_BIG=Array.from({length:18},()=>({rx:Math.random(),ry:Math.random(),r:Math.random()*2+0.8,twinkle:Math.random()*Math.PI*2}));
-// 中等星星
-const STARS_MED=Array.from({length:60},()=>({rx:Math.random(),ry:Math.random(),r:Math.random()*1.1+0.4,a:Math.random()*0.5+0.3,twinkle:Math.random()*Math.PI*2}));
-// 遠景星星
-const STARS_FAR=Array.from({length:220},()=>({rx:Math.random(),ry:Math.random(),r:Math.random()*0.6+0.1,a:Math.random()*0.4+0.08}));
-
-// 星雲位置與動態
-const NEBS=[
-  {bx:.22,by:.28,amp:.07,freq:3e-4,phase:0,  r:.55,c:'rgba(30,8,70,0.65)'},
-  {bx:.78,by:.65,amp:.05,freq:2e-4,phase:2.1,r:.6, c:'rgba(8,22,70,0.55)'},
-  {bx:.5, by:.15,amp:.04,freq:4e-4,phase:4.2,r:.4, c:'rgba(8,30,30,0.45)'},
-  {bx:.08,by:.75,amp:.05,freq:3e-4,phase:1.1,r:.38,c:'rgba(70,8,30,0.4)'},
-  {bx:.92,by:.3, amp:.04,freq:2e-4,phase:3.3,r:.35,c:'rgba(8,8,70,0.35)'},
-  {bx:.55,by:.88,amp:.03,freq:5e-4,phase:5.5,r:.32,c:'rgba(30,8,50,0.3)'},
+// 節點位置定義（根據用戶提供的 JSON）
+const COSMOS_NODES=[
+  {id:'RRP/D', c:0x33b5e5, x:10,  y:-5,  z:0},
+  {id:'WALCL', c:0x0099cc, x:-8,  y:2,   z:0},
+  {id:'USDC',  c:0x00acc1, x:12,  y:-18, z:0},
+  {id:'RRP/TL',c:0x4dd0e1, x:30,  y:-15, z:0},
+  {id:'M2SL',  c:0x0288d1, x:-10, y:-15, z:0},
+  {id:'GOLD',  c:0xffbb33, x:-22, y:12,  z:0},
+  {id:'BTC.D', c:0xffa000, x:-30, y:0,   z:0},
+  {id:'GB',    c:0xf57c00, x:-32, y:-12, z:0},
+  {id:'IN',    c:0xef6c00, x:-18, y:-10, z:0},
+  {id:'FF',    c:0xfbc02d, x:0,   y:25,  z:0},
+  {id:'USINTR',c:0xfbc02d, x:2,   y:12,  z:0},
+  {id:'2Y',    c:0xf9a825, x:25,  y:28,  z:0},
+  {id:'JP',    c:0x00C851, x:-15, y:25,  z:0},
+  {id:'IT',    c:0x007E33, x:12,  y:20,  z:0},
+  {id:'VIX',   c:0x00c853, x:28,  y:10,  z:0},
+  {id:'WTI',   c:0x43a047, x:-20, y:-2,  z:0},
+  {id:'BRENT', c:0x2e7d32, x:15,  y:5,   z:0},
+  {id:'FR',    c:0x4caf50, x:25,  y:-5,  z:0},
+  {id:'DXY',   c:0x388e3c, x:-28, y:-20, z:0},
+  {id:'TGA',   c:0x66bb6a, x:-5,  y:-8,  z:0},
+  {id:'CN',    c:0x2e7d32, x:5,   y:-15, z:0},
+  {id:'USDT',  c:0x4caf50, x:8,   y:-28, z:0},
+  {id:'DE',    c:0x43a047, x:-15, y:-30, z:0},
+  {id:'CA',    c:0x388e3c, x:0,   y:-35, z:0},
+  {id:'SILV',  c:0xff4444, x:-12, y:8,   z:0},
+  {id:'TIPS',  c:0xcc0000, x:-5,  y:12,  z:0},
+  {id:'BR',    c:0xff3333, x:-2,  y:-25, z:0},
+  {id:'ALT.D', c:0xa371f7, x:20,  y:-25, z:0},
+  {id:'RRP/R', c:0x00bcd4, x:38,  y:-22, z:0},
+  {id:'10Y',   c:0xffd740, x:18,  y:22,  z:0},
 ];
 
-function cosmosColor(sc){
-  if(sc>=9) return{f:'#c0f0ff',l:'#ffffff',m:'#60d8ff',d:'#002040'};
-  if(sc>=7.5)return{f:'#00cfff',l:'#90e8ff',m:'#0090c0',d:'#001830'};
-  if(sc>=6) return{f:'#2eba62',l:'#80f0a0',m:'#189040',d:'#041510'};
-  if(sc>=4.5)return{f:'#39d353',l:'#9ef5b0',m:'#22a040',d:'#051a08'};
-  if(sc>=3) return{f:'#d4a017',l:'#ffd060',m:'#a07010',d:'#201000'};
-  if(sc>=1.5)return{f:'#f0883e',l:'#ffb870',m:'#c06020',d:'#200a00'};
-  return        {f:'#f04848',l:'#ff8888',m:'#c01818',d:'#220000'};
+// Three.js 物件命名空間
+const TC={scene:null,cam:null,renderer:null,lblRenderer:null,controls:null,af:null,glows:[],t:0};
+
+// 建立發光材質貼圖
+function makeGlowTex(hexColor){
+  const s=256,cv=document.createElement('canvas');cv.width=cv.height=s;
+  const ctx=cv.getContext('2d');
+  const r=(hexColor>>16)&255,g=(hexColor>>8)&255,b=hexColor&255;
+  const grd=ctx.createRadialGradient(128,128,0,128,128,128);
+  grd.addColorStop(0,`rgba(${r},${g},${b},0.9)`);
+  grd.addColorStop(0.25,`rgba(${r},${g},${b},0.45)`);
+  grd.addColorStop(0.6,`rgba(${r},${g},${b},0.12)`);
+  grd.addColorStop(1,`rgba(${r},${g},${b},0)`);
+  ctx.fillStyle=grd;ctx.fillRect(0,0,s,s);
+  return new THREE.CanvasTexture(cv);
 }
 
 function initCosmos(){
-  const canvas=document.getElementById('cosmosCanvas');
-  const pnl=document.getElementById('view-bubble');
-  canvas.width=pnl.clientWidth||window.innerWidth;
-  canvas.height=pnl.clientHeight||window.innerHeight-200;
-  const W=canvas.width,H=canvas.height;
-  cBubbles=[];
-  IND_ORDER.forEach(meta=>{
-    const d=S.data[meta.sid];
-    if(!d||d.error||d.score==null)return;
-    const sc=d.score;
-    const r=18+sc*3.8;
-    const ang=Math.random()*Math.PI*2;
-    const dist=(0.12+Math.random()*0.32)*Math.min(W,H);
-    cBubbles.push({
-      sid:meta.sid,cn:meta.cn,sn:meta.sn||meta.sid,score:sc,grp:meta.grp,
-      r,...cosmosColor(sc),
-      x:W/2+Math.cos(ang)*dist,y:H/2+Math.sin(ang)*dist,
-      vx:(Math.random()-0.5)*0.35,vy:(Math.random()-0.5)*0.35,
-      phase:Math.random()*Math.PI*2,  // pulsation phase
-      orbitPhase:Math.random()*Math.PI*2
+  const container=document.getElementById('view-bubble');
+  // 移除舊的 Three.js 元素（保留 legend）
+  container.querySelectorAll('canvas,div:not(#cosmos-legend):not(.cl-item)').forEach(el=>el.remove());
+  if(TC.af){cancelAnimationFrame(TC.af);TC.af=null}
+  if(TC.renderer){TC.renderer.dispose()}
+
+  const W=container.clientWidth||window.innerWidth;
+  const H=container.clientHeight||window.innerHeight;
+
+  // ── 場景 ──
+  TC.scene=new THREE.Scene();
+
+  // ── 攝影機 ──
+  TC.cam=new THREE.PerspectiveCamera(60,W/H,0.1,1000);
+  TC.cam.position.set(0,0,95);
+
+  // ── 渲染器 ──
+  TC.renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
+  TC.renderer.setSize(W,H);
+  TC.renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  TC.renderer.setClearColor(0x030308,1);
+  TC.renderer.domElement.style.cssText='position:absolute;top:0;left:0;cursor:grab';
+  container.insertBefore(TC.renderer.domElement,container.firstChild);
+
+  // ── CSS2D 標籤渲染器 ──
+  TC.lblRenderer=new THREE.CSS2DRenderer();
+  TC.lblRenderer.setSize(W,H);
+  TC.lblRenderer.domElement.style.cssText='position:absolute;top:0;left:0;pointer-events:none;overflow:hidden';
+  container.insertBefore(TC.lblRenderer.domElement,container.firstChild);
+
+  // ── 軌道控制器 ──
+  TC.controls=new THREE.OrbitControls(TC.cam,TC.renderer.domElement);
+  TC.controls.enableDamping=true;TC.controls.dampingFactor=0.06;
+  TC.controls.minDistance=30;TC.controls.maxDistance=280;
+  TC.controls.autoRotate=true;TC.controls.autoRotateSpeed=0.4;
+
+  // ── 建立場景內容 ──
+  buildStarField();
+  buildNebulas();
+  buildLights();
+  buildSpheres();
+
+  // ── 啟動動畫 ──
+  TC.glows=[];
+  TC.scene.traverse(obj=>{if(obj.isSprite&&obj.userData.isGlow)TC.glows.push(obj)});
+  animateCosmos();
+}
+
+function buildStarField(){
+  // 4,500 顆繁星（三層亮度）
+  const geo=new THREE.BufferGeometry();
+  const v=[];
+  for(let i=0;i<4500;i++){
+    v.push((Math.random()-.5)*400,(Math.random()-.5)*400,(Math.random()-.5)*400-50);
+  }
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(v,3));
+  // 小暗星
+  TC.scene.add(new THREE.Points(geo,new THREE.PointsMaterial({color:0xaabbcc,size:0.35,sizeAttenuation:true,transparent:true,opacity:0.6})));
+  // 少量亮星
+  const geo2=new THREE.BufferGeometry();
+  const v2=[];
+  for(let i=0;i<150;i++)v2.push((Math.random()-.5)*380,(Math.random()-.5)*380,(Math.random()-.5)*380-50);
+  geo2.setAttribute('position',new THREE.Float32BufferAttribute(v2,3));
+  TC.scene.add(new THREE.Points(geo2,new THREE.PointsMaterial({color:0xddeeff,size:1.2,sizeAttenuation:true,transparent:true,opacity:0.85})));
+}
+
+function buildNebulas(){
+  const nebs=[
+    {x:-25,y:15, z:-30,size:90, hex:0x1a0a3a},
+    {x:30, y:-18,z:-35,size:100,hex:0x0a1a3a},
+    {x:0,  y:-30,z:-40,size:80, hex:0x0a1a1a},
+    {x:-30,y:-15,z:-25,size:70, hex:0x3a0a1a},
+    {x:25, y:20, z:-30,size:75, hex:0x0a0a3a},
+  ];
+  nebs.forEach(n=>{
+    const tex=makeGlowTex(n.hex);
+    const mat=new THREE.SpriteMaterial({map:tex,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,opacity:0.7});
+    const sp=new THREE.Sprite(mat);
+    sp.position.set(n.x,n.y,n.z);sp.scale.set(n.size,n.size,1);
+    TC.scene.add(sp);
+  });
+}
+
+function buildLights(){
+  TC.scene.add(new THREE.AmbientLight(0x223366,2.5));
+  const pl=new THREE.PointLight(0x4488ff,1.5,200);pl.position.set(0,0,50);TC.scene.add(pl);
+  const pl2=new THREE.PointLight(0x8844ff,0.8,150);pl2.position.set(-40,20,20);TC.scene.add(pl2);
+}
+
+function buildSpheres(){
+  COSMOS_NODES.forEach(n=>{
+    const meta=IND_ORDER.find(m=>m.sn===n.id);
+    const d=meta?S.data[meta.sid]:null;
+    const score=d?.score??5;
+    const color=n.c;
+    const r=Math.max(1.2,score*0.58); // 半徑從評分計算
+
+    // ── 主球體 ──
+    const geo=new THREE.SphereGeometry(r,32,32);
+    const mat=new THREE.MeshPhongMaterial({
+      color:color, emissive:color, emissiveIntensity:0.35,
+      transparent:true, opacity:0.88,
+      shininess:90
     });
+    const mesh=new THREE.Mesh(geo,mat);
+    mesh.position.set(n.x,n.y,n.z);
+    mesh.userData={id:n.id,score,cn:meta?.cn||n.id,baseEmissive:0.35,phase:Math.random()*Math.PI*2};
+    TC.scene.add(mesh);
+
+    // ── 外發光球體（較大，半透明）──
+    const outerGeo=new THREE.SphereGeometry(r*1.7,16,16);
+    const outerMat=new THREE.MeshBasicMaterial({color,transparent:true,opacity:0.08,side:THREE.BackSide,depthWrite:false});
+    mesh.add(new THREE.Mesh(outerGeo,outerMat));
+
+    // ── Sprite 光暈 ──
+    const glowTex=makeGlowTex(color);
+    const glowMat=new THREE.SpriteMaterial({map:glowTex,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,opacity:0.75});
+    const glow=new THREE.Sprite(glowMat);
+    glow.scale.set(r*8,r*8,1);glow.position.set(n.x,n.y,n.z);
+    glow.userData={isGlow:true,baseScale:r*8,phase:Math.random()*Math.PI*2};
+    TC.scene.add(glow);
+
+    // ── CSS2D 標籤 ──
+    const div=document.createElement('div');
+    div.className='cosmos-lbl';
+    const scoreStr=d&&d.score!=null?d.score.toFixed(1):'—';
+    const scoreColor=score>=7?'#80f0c0':score>=4?'#ffd080':'#ff9090';
+    div.innerHTML=`<b>${n.id}</b><small style="color:${scoreColor}">${scoreStr}</small>`;
+    const lbl=new THREE.CSS2DObject(div);
+    lbl.position.set(0,-r-0.8,0);
+    mesh.add(lbl);
   });
-  // mouse/touch
-  canvas.onmousemove=e=>{const rc=canvas.getBoundingClientRect(),mx=e.clientX-rc.left,my=e.clientY-rc.top;cHov=cBubbles.find(b=>{const dx=b.x-mx,dy=b.y-my;return Math.sqrt(dx*dx+dy*dy)<b.r*1.3})||null};
-  canvas.onmouseleave=()=>cHov=null;
-  canvas.ontouchmove=e=>{e.preventDefault();const rc=canvas.getBoundingClientRect(),t=e.touches[0],mx=t.clientX-rc.left,my=t.clientY-rc.top;cHov=cBubbles.find(b=>{const dx=b.x-mx,dy=b.y-my;return Math.sqrt(dx*dx+dy*dy)<b.r*1.3})||null};
-  if(cosmosAF)cancelAnimationFrame(cosmosAF);
-  animCosmos();
 }
 
-function animCosmos(){
-  const canvas=document.getElementById('cosmosCanvas');
-  if(!canvas||S.view!=='bubble'){cosmosAF=null;return}
-  const ctx=canvas.getContext('2d');
-  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2;
-  cT++;
-
-  // ── 背景：清除 ──
-  ctx.fillStyle='#020408';ctx.fillRect(0,0,W,H);
-
-  // ── 動態星雲 ──
-  NEBS.forEach(n=>{
-    const nx=(n.bx+Math.sin(cT*n.freq+n.phase)*n.amp)*W;
-    const ny=(n.by+Math.cos(cT*n.freq*0.7+n.phase)*n.amp*0.8)*H;
-    const gr=ctx.createRadialGradient(nx,ny,0,nx,ny,n.r*Math.min(W,H));
-    gr.addColorStop(0,n.c);gr.addColorStop(0.6,n.c.replace(/[\d.]+\)$/,'0.15)'));gr.addColorStop(1,'transparent');
-    ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
+function animateCosmos(){
+  if(S.view!=='bubble'){TC.af=null;return}
+  TC.af=requestAnimationFrame(animateCosmos);
+  TC.t+=0.01;
+  TC.controls?.update();
+  // 脈衝光暈
+  TC.glows.forEach(g=>{
+    const pulse=1+Math.sin(TC.t*1.2+g.userData.phase)*0.07;
+    const bs=g.userData.baseScale;
+    g.scale.set(bs*pulse,bs*pulse,1);
   });
-
-  // ── 宇宙星塵 ──
-  DUST.forEach(d=>{
-    d.rx+=d.vx+Math.sin(cT*1e-4+d.ry*8)*8e-5;
-    d.ry+=d.vy+Math.cos(cT*8e-5+d.rx*8)*6e-5;
-    if(d.rx<0)d.rx=1;if(d.rx>1)d.rx=0;
-    if(d.ry<0)d.ry=1;if(d.ry>1)d.ry=0;
-    ctx.beginPath();ctx.arc(d.rx*W,d.ry*H,d.r,0,Math.PI*2);
-    ctx.fillStyle=`hsla(${d.hue},80%,72%,${d.a})`;ctx.fill();
-  });
-
-  // ── 遠景星星 ──
-  STARS_FAR.forEach(s=>{ctx.beginPath();ctx.arc(s.rx*W,s.ry*H,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${s.a})`;ctx.fill()});
-
-  // ── 中等星星 (閃爍) ──
-  STARS_MED.forEach(s=>{
-    const flick=0.7+Math.sin(cT*0.018+s.twinkle)*0.3;
-    ctx.beginPath();ctx.arc(s.rx*W,s.ry*H,s.r,0,Math.PI*2);
-    ctx.fillStyle=`rgba(255,255,255,${s.a*flick})`;ctx.fill();
-  });
-
-  // ── 大星星 (發光+閃爍) ──
-  STARS_BIG.forEach(s=>{
-    const flick=0.75+Math.sin(cT*0.022+s.twinkle)*0.25;
-    const sg=ctx.createRadialGradient(s.rx*W,s.ry*H,0,s.rx*W,s.ry*H,s.r*7);
-    sg.addColorStop(0,`rgba(200,220,255,${0.45*flick})`);sg.addColorStop(1,'transparent');
-    ctx.beginPath();ctx.arc(s.rx*W,s.ry*H,s.r*7,0,Math.PI*2);ctx.fillStyle=sg;ctx.fill();
-    ctx.beginPath();ctx.arc(s.rx*W,s.ry*H,s.r,0,Math.PI*2);
-    ctx.fillStyle=`rgba(255,255,255,${0.95*flick})`;ctx.fill();
-  });
-
-  // ── 物理更新 ──
-  for(let i=0;i<cBubbles.length;i++){
-    const b=cBubbles[i];
-    b.vx+=(cx-b.x)*5e-4; b.vy+=(cy-b.y)*5e-4;
-    for(let j=i+1;j<cBubbles.length;j++){
-      const b2=cBubbles[j];
-      const dx=b.x-b2.x,dy=b.y-b2.y;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      const md=b.r+b2.r+14;
-      if(dist<md&&dist>0.1){const f=(md-dist)/dist*0.032;b.vx+=dx*f;b.vy+=dy*f;b2.vx-=dx*f;b2.vy-=dy*f}
+  // 球體發光脈衝
+  TC.scene.traverse(obj=>{
+    if(obj.isMesh&&obj.userData.phase!==undefined){
+      const ei=obj.userData.baseEmissive+Math.sin(TC.t*1.5+obj.userData.phase)*0.12;
+      if(obj.material.emissiveIntensity!==undefined)obj.material.emissiveIntensity=Math.max(0.1,ei);
     }
-    b.vx*=0.92;b.vy*=0.92;
-    b.vx+=(Math.random()-0.5)*0.035;b.vy+=(Math.random()-0.5)*0.028;
-    b.x+=b.vx;b.y+=b.vy;
-    const pad=b.r+5;
-    if(b.x<pad){b.x=pad;b.vx=Math.abs(b.vx)*0.45}if(b.x>W-pad){b.x=W-pad;b.vx=-Math.abs(b.vx)*0.45}
-    if(b.y<pad){b.y=pad;b.vy=Math.abs(b.vy)*0.45}if(b.y>H-pad){b.y=H-pad;b.vy=-Math.abs(b.vy)*0.45}
-  }
-
-  // ── 同組能量連線 ──
-  ctx.save();
-  for(let i=0;i<cBubbles.length;i++){
-    for(let j=i+1;j<cBubbles.length;j++){
-      const b1=cBubbles[i],b2=cBubbles[j];
-      if(b1.grp!==b2.grp)continue;
-      const dx=b2.x-b1.x,dy=b2.y-b1.y,dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist>180)continue;
-      const alpha=(1-dist/180)*0.18;
-      const grd=ctx.createLinearGradient(b1.x,b1.y,b2.x,b2.y);
-      grd.addColorStop(0,b1.f+Math.floor(alpha*255).toString(16).padStart(2,'0'));
-      grd.addColorStop(1,b2.f+Math.floor(alpha*255).toString(16).padStart(2,'0'));
-      ctx.strokeStyle=grd;ctx.lineWidth=1;ctx.setLineDash([3,9]);
-      ctx.beginPath();ctx.moveTo(b1.x,b1.y);ctx.lineTo(b2.x,b2.y);ctx.stroke();
-    }
-  }
-  ctx.setLineDash([]);ctx.restore();
-
-  // ── 繪製泡泡 ──
-  cBubbles.forEach(b=>{
-    const isH=b===cHov;
-    const pulse=1+Math.sin(cT*0.025+b.phase)*0.025;
-    const r=b.r*pulse*(isH?1.1:1);
-    const x=b.x,y=b.y;
-
-    // 深層星雲光暈 (最外層)
-    const halo2=ctx.createRadialGradient(x,y,r*0.8,x,y,r*3.5);
-    halo2.addColorStop(0,b.f+'18');halo2.addColorStop(0.4,b.f+'0a');halo2.addColorStop(1,'transparent');
-    ctx.beginPath();ctx.arc(x,y,r*3.5,0,Math.PI*2);ctx.fillStyle=halo2;ctx.fill();
-
-    // 大氣散射光
-    const atmo=ctx.createRadialGradient(x,y,r*0.7,x,y,r*1.6);
-    atmo.addColorStop(0,b.f+'00');atmo.addColorStop(0.5,b.f+'44');atmo.addColorStop(1,b.f+'00');
-    ctx.beginPath();ctx.arc(x,y,r*1.6,0,Math.PI*2);ctx.fillStyle=atmo;ctx.fill();
-
-    // 球體本體 (Phong shading)
-    const body=ctx.createRadialGradient(x-r*.32,y-r*.36,r*.04,x,y,r);
-    body.addColorStop(0,b.l+'ff');body.addColorStop(0.25,b.f+'f8');
-    body.addColorStop(0.65,b.m+'d8');body.addColorStop(1,b.d+'b0');
-    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=body;ctx.fill();
-
-    // 虹彩邊框
-    ctx.strokeStyle=isH?b.l+'cc':b.f+'66';ctx.lineWidth=isH?2:1.2;
-    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.stroke();
-
-    // 主鏡面高光
-    const spec1=ctx.createRadialGradient(x-r*.36,y-r*.4,0,x-r*.2,y-r*.22,r*.62);
-    spec1.addColorStop(0,'rgba(255,255,255,0.78)');spec1.addColorStop(0.35,'rgba(255,255,255,0.18)');spec1.addColorStop(1,'transparent');
-    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=spec1;ctx.fill();
-
-    // 次要菲涅爾反射 (底部)
-    const spec2=ctx.createRadialGradient(x+r*.4,y+r*.42,0,x+r*.4,y+r*.42,r*.3);
-    spec2.addColorStop(0,'rgba(255,255,255,0.22)');spec2.addColorStop(1,'transparent');
-    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=spec2;ctx.fill();
-
-    // 軌道微粒
-    const orbitN=Math.min(Math.floor(b.score)+1,10);
-    for(let i=0;i<orbitN;i++){
-      const ang=cT*0.015*(i%2===0?1:-1)+b.orbitPhase+i/orbitN*Math.PI*2;
-      const orR=r*(1.35+(i%3)*0.18);
-      const px=x+Math.cos(ang)*orR,py=y+Math.sin(ang)*orR;
-      const pr=1.4+Math.sin(cT*0.02+i)*0.4;
-      const partG=ctx.createRadialGradient(px,py,0,px,py,pr*2.5);
-      partG.addColorStop(0,b.l+'cc');partG.addColorStop(1,'transparent');
-      ctx.beginPath();ctx.arc(px,py,pr*2.5,0,Math.PI*2);ctx.fillStyle=partG;ctx.fill();
-      ctx.beginPath();ctx.arc(px,py,pr,0,Math.PI*2);ctx.fillStyle=b.l+'dd';ctx.fill();
-    }
-
-    // 標籤
-    const fs=Math.max(9,Math.min(14,r*.38));
-    ctx.shadowColor=b.f;ctx.shadowBlur=6;
-    ctx.fillStyle='rgba(255,255,255,0.96)';ctx.font=`bold ${fs}px 'Segoe UI',sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(b.sn,x,y-fs*.45);
-    ctx.font=`${Math.max(7,fs*.82)}px 'Segoe UI',sans-serif`;ctx.fillStyle=b.l;ctx.shadowBlur=4;
-    ctx.fillText(b.score.toFixed(1),x,y+fs*.8);
-    ctx.shadowBlur=0;
   });
-
-  // ── 懸停 Tooltip (Canvas內) ──
-  if(cHov){
-    const b=cHov;
-    const tw=172,th=46;
-    const tx=Math.min(Math.max(b.x-tw/2,5),W-tw-5);
-    const ty=Math.max(b.y-b.r*1.3-58,5);
-    // 背景
-    ctx.fillStyle='rgba(8,13,24,0.94)';
-    ctx.strokeStyle=b.f+'99';ctx.lineWidth=1.5;
-    ctx.beginPath();
-    if(ctx.roundRect)ctx.roundRect(tx,ty,tw,th,6);else ctx.rect(tx,ty,tw,th);
-    ctx.fill();ctx.stroke();
-    // 文字
-    const nm=b.cn.length>18?b.cn.slice(0,18)+'…':b.cn;
-    ctx.fillStyle='rgba(200,216,240,0.9)';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.textBaseline='top';
-    ctx.fillText(nm,tx+8,ty+7);
-    ctx.fillStyle=b.l;ctx.font='bold 13px sans-serif';
-    ctx.fillText(`評分：${b.score.toFixed(1)} / 10`,tx+8,ty+24);
-  }
-
-  cosmosAF=requestAnimationFrame(animCosmos);
+  TC.renderer.render(TC.scene,TC.cam);
+  TC.lblRenderer?.render(TC.scene,TC.cam);
 }
+
 
 // ── RELOAD ────────────────────────────────────────────────
 async function reloadData(){
@@ -675,7 +653,7 @@ async function reloadData(){
     const j=await r.json();
     S.data={};S.hist={};S.checked=new Set();
     if(S.chart){S.chart.destroy();S.chart=null}
-    if(cosmosAF){cancelAnimationFrame(cosmosAF);cosmosAF=null}
+    if(TC.af){cancelAnimationFrame(TC.af);TC.af=null}
     document.getElementById('tbl-body').innerHTML='';
     document.getElementById('line-legend').innerHTML='';
     populate(j);
