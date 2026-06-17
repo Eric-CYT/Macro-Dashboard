@@ -527,6 +527,7 @@ function initCosmos(){
   buildNebulas();
   buildLights();
   buildSpheres();
+  buildConnections();
 
   // ── 啟動動畫 ──
   TC.glows=[];
@@ -575,6 +576,39 @@ function buildLights(){
   const pl2=new THREE.PointLight(0x8844ff,0.8,150);pl2.position.set(-40,20,20);TC.scene.add(pl2);
 }
 
+// ── Canvas Sprite 文字標籤（比 CSS2DRenderer 更可靠）──
+function makeTextSprite(id, score){
+  const W=256,H=72,cv=document.createElement('canvas');
+  cv.width=W;cv.height=H;
+  const ctx=cv.getContext('2d');
+  // 半透明膠囊背景
+  ctx.fillStyle='rgba(4,9,20,0.72)';
+  ctx.beginPath();
+  if(ctx.roundRect)ctx.roundRect(6,4,W-12,H-8,9);else ctx.rect(6,4,W-12,H-8);
+  ctx.fill();
+  // 邊框顏色按評分
+  const gc=score>=7?'rgba(80,240,160,0.55)':score>=4?'rgba(255,210,80,0.55)':'rgba(255,100,100,0.55)';
+  ctx.strokeStyle=gc;ctx.lineWidth=2;ctx.stroke();
+  // 指標名稱
+  const glow=score>=7?'#40e0a0':score>=4?'#ffc040':'#ff6060';
+  ctx.fillStyle='rgba(215,232,255,0.97)';
+  ctx.font='bold 29px "Segoe UI",Arial,sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.shadowColor=glow;ctx.shadowBlur=10;
+  ctx.fillText(id,W/2,H*.38);
+  // 評分數值
+  ctx.fillStyle=glow;
+  ctx.font='21px "Segoe UI",Arial,sans-serif';
+  ctx.shadowColor=glow;ctx.shadowBlur=7;
+  ctx.fillText(score.toFixed(1),W/2,H*.76);
+  ctx.shadowBlur=0;
+  const tex=new THREE.CanvasTexture(cv);
+  const mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false,depthWrite:false});
+  const sp=new THREE.Sprite(mat);
+  sp.scale.set(W/H*3.2,3.2,1); // ≈ 11.4 × 3.2 世界單位
+  return sp;
+}
+
 function buildSpheres(){
   COSMOS_NODES.forEach(n=>{
     const meta=IND_ORDER.find(m=>m.sn===n.id);
@@ -608,16 +642,67 @@ function buildSpheres(){
     glow.userData={isGlow:true,baseScale:r*8,phase:Math.random()*Math.PI*2};
     TC.scene.add(glow);
 
-    // ── CSS2D 標籤 ──
-    const div=document.createElement('div');
-    div.className='cosmos-lbl';
-    const scoreStr=d&&d.score!=null?d.score.toFixed(1):'—';
-    const scoreColor=score>=7?'#80f0c0':score>=4?'#ffd080':'#ff9090';
-    div.innerHTML=`<b>${n.id}</b><small style="color:${scoreColor}">${scoreStr}</small>`;
-    const lbl=new THREE.CSS2DObject(div);
-    lbl.position.set(0,-r-0.8,0);
-    mesh.add(lbl);
+    // ── Canvas Sprite 標籤（置於球體正下方）──
+    const lbl=makeTextSprite(n.id,score);
+    lbl.position.set(n.x, n.y-r-2.2, n.z);
+    TC.scene.add(lbl);
   });
+}
+
+// ── 關聯線 ────────────────────────────────────────────────
+// 同組關聯線（集群視覺化）
+const GRP_CONN={
+  liquidity:  {ids:['WALCL','M2SL','TGA','RRP/D','RRP/TL','RRP/R'], col:0x33b5e5, op:0.28},
+  us_rates:   {ids:['FF','USINTR','2Y','10Y','TIPS'],                col:0xfbc02d, op:0.25},
+  commodities:{ids:['GOLD','SILV','WTI','BRENT'],                   col:0xffbb33, op:0.28},
+  crypto:     {ids:['BTC.D','ALT.D','USDC','USDT'],                 col:0xa371f7, op:0.30},
+  global:     {ids:['JP','CN','DE','IN','GB','FR','IT','BR','CA'],  col:0x4caf50, op:0.18},
+};
+// 跨組信號線（關鍵宏觀相關性）
+const SIGNAL_CONN=[
+  {a:'FF',    b:'WALCL',  label:'利率↔資產負債表'},
+  {a:'FF',    b:'RRP/D',  label:'利率→RRP規模'},
+  {a:'DXY',   b:'GOLD',   label:'美元↔黃金反向'},
+  {a:'DXY',   b:'WTI',    label:'美元↔油價反向'},
+  {a:'VIX',   b:'BTC.D',  label:'恐慌↔幣圈情緒'},
+  {a:'2Y',    b:'10Y',    label:'殖利率曲線'},
+  {a:'RRP/D', b:'M2SL',   label:'RRP↔廣義流動性'},
+  {a:'WALCL', b:'BTC.D',  label:'QE/QT↔加密'},
+];
+
+function buildConnections(){
+  const posMap={};
+  COSMOS_NODES.forEach(n=>posMap[n.id]={x:n.x,y:n.y,z:n.z});
+  // 同組連線
+  Object.values(GRP_CONN).forEach(g=>{
+    const pts=[];
+    for(let i=0;i<g.ids.length;i++){
+      for(let j=i+1;j<g.ids.length;j++){
+        const p1=posMap[g.ids[i]],p2=posMap[g.ids[j]];
+        if(!p1||!p2)continue;
+        pts.push(p1.x,p1.y,p1.z, p2.x,p2.y,p2.z);
+      }
+    }
+    if(!pts.length)return;
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
+    TC.scene.add(new THREE.LineSegments(geo,
+      new THREE.LineBasicMaterial({color:g.col,transparent:true,opacity:g.op,depthWrite:false})));
+  });
+  // 跨組信號連線（白色虛線感）
+  const sigPts=[];
+  SIGNAL_CONN.forEach(s=>{
+    const p1=posMap[s.a],p2=posMap[s.b];
+    if(p1&&p2)sigPts.push(p1.x,p1.y,p1.z, p2.x,p2.y,p2.z);
+  });
+  if(sigPts.length){
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.Float32BufferAttribute(sigPts,3));
+    const mat=new THREE.LineDashedMaterial({color:0xaaccff,transparent:true,opacity:0.22,dashSize:1.5,gapSize:1.2,depthWrite:false});
+    const segs=new THREE.LineSegments(geo,mat);
+    segs.computeLineDistances(); // LineDashedMaterial 必要
+    TC.scene.add(segs);
+  }
 }
 
 function animateCosmos(){
@@ -639,7 +724,8 @@ function animateCosmos(){
     }
   });
   TC.renderer.render(TC.scene,TC.cam);
-  TC.lblRenderer?.render(TC.scene,TC.cam);
+  // CSS2DRenderer 作為備用（主要標籤已用 Canvas Sprite 實作）
+  try{TC.lblRenderer?.render(TC.scene,TC.cam)}catch(e){}
 }
 
 
